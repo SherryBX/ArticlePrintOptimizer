@@ -726,12 +726,46 @@
         });
         
         // 优化文章容器
-        // 查找文章主体内容容器
+        // 查找文章主体内容容器 - 重点优化Post-Row-Content-left-article
+        const mainContent = document.querySelector('.Post-Row-Content-left-article');
+        if (mainContent) {
+            mainContent.style.cssText = `
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
+                padding: 20px !important;
+                box-sizing: border-box !important;
+            `;
+
+            // 处理主内容区域内的图片居中
+            mainContent.querySelectorAll('img').forEach(img => {
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+                img.style.margin = '10px auto';
+                img.style.display = 'block';
+                img.setAttribute('loading', 'eager'); // 确保图片在打印时可见
+            });
+            
+            // 处理文本和段落
+            mainContent.querySelectorAll('p').forEach(p => {
+                p.style.textAlign = 'left';
+                p.style.margin = '1em 0';
+                p.style.lineHeight = '1.6';
+            });
+            
+            // 优化标题
+            mainContent.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+                h.style.textAlign = 'center';
+                h.style.margin = '1.2em 0 0.8em 0';
+            });
+        }
+        
+        // 兼容其他容器
         let articleContainer = document.querySelector('.Post-RichTextContainer') || 
                               document.querySelector('.RichContent-inner') || 
                               document.querySelector('.Post-RichText');
                               
-        if (articleContainer) {
+        if (articleContainer && !mainContent) {
             articleContainer.style.cssText = `
                 width: 100% !important;
                 max-width: 100% !important;
@@ -753,7 +787,7 @@
             `;
         }
         
-        // 优化图片显示
+        // 优化图片显示 - 处理所有可能的图片
         const imageSelectors = ['.RichText img', '.RichContent-inner img', '.Post-RichText img', '.content img'];
         imageSelectors.forEach(selector => {
             document.querySelectorAll(selector).forEach(img => {
@@ -783,14 +817,18 @@
                     text-align: center !important;
                 }
                 
-                .RichText, .RichContent-inner {
+                .RichText, .RichContent-inner, .Post-Row-Content-left-article {
                     font-size: 12pt !important;
                     line-height: 1.5 !important;
+                    text-align: left !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
                 }
                 
                 h1, h2, h3, h4, h5, h6 {
                     page-break-after: avoid !important;
                     page-break-inside: avoid !important;
+                    text-align: center !important;
                 }
                 
                 pre, code, table, .highlight {
@@ -803,6 +841,8 @@
                     page-break-inside: avoid !important;
                     max-width: 100% !important;
                     height: auto !important;
+                    margin: 10px auto !important;
+                    display: block !important;
                 }
                 
                 a {
@@ -812,6 +852,11 @@
                 
                 #article-print-panel {
                     display: none !important;
+                }
+                
+                .Post-Row-Content-left-article p, .RichText p {
+                    text-align: left !important;
+                    margin: 1em 0 !important;
                 }
                 
                 /* 添加页码 */
