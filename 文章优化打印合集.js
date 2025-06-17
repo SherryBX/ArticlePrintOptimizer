@@ -725,8 +725,39 @@
             });
         });
         
-        // 优化文章容器
-        // 查找文章主体内容容器 - 重点优化Post-Row-Content-left-article
+        // 优化知乎文章的整体布局结构
+        const postRowContent = document.querySelector('.Post-Row-Content');
+        if (postRowContent) {
+            postRowContent.style.cssText = `
+                width: 100% !important;
+                max-width: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+            `;
+            
+            // 优化左侧内容区域，使其居中
+            const leftContent = document.querySelector('.Post-Row-Content-left');
+            if (leftContent) {
+                leftContent.style.cssText = `
+                    width: 100% !important;
+                    max-width: 800px !important;
+                    margin: 0 auto !important;
+                    float: none !important;
+                    padding: 0 20px !important;
+                `;
+            }
+            
+            // 隐藏右侧边栏
+            const rightContent = document.querySelector('.Post-Row-Content-right');
+            if (rightContent) {
+                rightContent.style.display = 'none';
+            }
+        }
+        
+        // 优化文章主体内容区
         const mainContent = document.querySelector('.Post-Row-Content-left-article');
         if (mainContent) {
             mainContent.style.cssText = `
@@ -743,7 +774,23 @@
                 img.style.height = 'auto';
                 img.style.margin = '10px auto';
                 img.style.display = 'block';
+                
+                // 修复绝对定位的图片
+                if (img.style.position === 'absolute') {
+                    img.style.position = 'relative';
+                    img.style.inset = 'auto';
+                }
+                
                 img.setAttribute('loading', 'eager'); // 确保图片在打印时可见
+            });
+            
+            // 修复图片容器
+            mainContent.querySelectorAll('.css-1ld0bim').forEach(container => {
+                container.style.cssText = `
+                    margin: 10px 0 !important;
+                    text-align: center !important;
+                    position: relative !important;
+                `;
             });
             
             // 处理文本和段落
@@ -762,14 +809,14 @@
         
         // 兼容其他容器
         let articleContainer = document.querySelector('.Post-RichTextContainer') || 
-                              document.querySelector('.RichContent-inner') || 
-                              document.querySelector('.Post-RichText');
-                              
-        if (articleContainer && !mainContent) {
+                             document.querySelector('.RichContent-inner') || 
+                             document.querySelector('.Post-RichText');
+                             
+        if (articleContainer) {
             articleContainer.style.cssText = `
                 width: 100% !important;
                 max-width: 100% !important;
-                padding: 0 20px !important;
+                padding: 0 !important;
                 margin: 0 auto !important;
                 box-sizing: border-box !important;
             `;
@@ -777,7 +824,7 @@
         
         // 调整文章容器
         const postMain = document.querySelector('.Post-Main') || 
-                         document.querySelector('.Post-NormalMain');
+                       document.querySelector('.Post-NormalMain');
         if (postMain) {
             postMain.style.cssText = `
                 width: 100% !important;
@@ -786,18 +833,6 @@
                 margin: 0 auto !important;
             `;
         }
-        
-        // 优化图片显示 - 处理所有可能的图片
-        const imageSelectors = ['.RichText img', '.RichContent-inner img', '.Post-RichText img', '.content img'];
-        imageSelectors.forEach(selector => {
-            document.querySelectorAll(selector).forEach(img => {
-                img.style.maxWidth = '100%';
-                img.style.height = 'auto';
-                img.style.margin = '10px auto';
-                img.style.display = 'block';
-                img.setAttribute('loading', 'eager'); // 确保图片在打印时可见
-            });
-        });
         
         // 添加打印样式
         const printStyle = document.createElement('style');
@@ -825,6 +860,12 @@
                     max-width: 100% !important;
                 }
                 
+                .Post-Row-Content, .Post-Row-Content-left {
+                    width: 100% !important;
+                    max-width: 100% !important; 
+                    margin: 0 auto !important;
+                }
+                
                 h1, h2, h3, h4, h5, h6 {
                     page-break-after: avoid !important;
                     page-break-inside: avoid !important;
@@ -843,6 +884,8 @@
                     height: auto !important;
                     margin: 10px auto !important;
                     display: block !important;
+                    position: relative !important;
+                    inset: auto !important;
                 }
                 
                 a {
@@ -857,6 +900,10 @@
                 .Post-Row-Content-left-article p, .RichText p {
                     text-align: left !important;
                     margin: 1em 0 !important;
+                }
+                
+                .Post-Row-Content-right {
+                    display: none !important;
                 }
                 
                 /* 添加页码 */
