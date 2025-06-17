@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         文章优化打印合集
 // @namespace    http://tampermonkey.net/
-// @version      3.1
-// @description  优化CSDN、稀土掘金和知乎专栏文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
+// @version      3.2
+// @description  优化CSDN、稀土掘金、知乎专栏和吾爱论坛文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
 // @author       Sherry
 // @match        *://*.csdn.net/*/article/details/*
 // @match        *://juejin.cn/post/*
 // @match        *://zhuanlan.zhihu.com/p/*
+// @match        *://www.52pojie.cn/thread-*-*-*.html
 // @grant        none
 // @run-at       document-end
 // @icon         https://tse1-mm.cn.bing.net/th/id/OIP-C.3iWufqIms_ccabhKcsM4GgHaHa?w=180&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7
@@ -22,6 +23,7 @@
     const isCSND = location.hostname.includes('csdn.net');
     const isJuejin = location.hostname.includes('juejin.cn');
     const isZhihu = location.hostname.includes('zhuanlan.zhihu.com');
+    const is52pojie = location.hostname.includes('52pojie.cn') && location.pathname.includes('/thread-');
     
     // 网站相关配置 - 统一使用蓝色主题
     const siteConfig = {
@@ -39,6 +41,11 @@
             name: '知乎',
             color: '#1890ff',
             icon: '📄'
+        },
+        pojie: {
+            name: '吾爱破解',
+            color: '#1890ff',
+            icon: '📄'
         }
     };
     
@@ -50,6 +57,8 @@
         currentSite = siteConfig.juejin;
     } else if (isZhihu) {
         currentSite = siteConfig.zhihu;
+    } else if (is52pojie) {
+        currentSite = siteConfig.pojie;
     }
     
     // 创建控制面板
@@ -923,6 +932,253 @@
         handlePrintOrSave(autoPrint, savePdf, articleTitle);
     }
     
+    // 优化吾爱论坛页面
+    function optimize52pojiePage(autoPrint = false, savePdf = false) {
+        // 保存原始标题用于PDF文件名
+        const articleTitle = document.querySelector('.ts')?.textContent || 
+                           document.title.replace(' - 吾爱破解 - LCG - LSG|安卓破解|病毒分析|www.52pojie.cn', '');
+        
+        // 移除不必要元素
+        const elementsToRemove = [
+            '#toptb', // 顶部工具栏
+            '#hd', // 顶部横幅区域
+            '#nv', // 导航区域
+            '#pt', // 面包屑导航
+            '#footer', // 页脚
+            '.pgs.mtm.mbm.cl', // 分页导航
+            '.bm.bml.pbn', // 帖子功能区
+            '#postlist > .ad_column', // 广告列
+            '.pls', // 用户信息侧边栏
+            '.p_pop', // 弹出菜单
+            '.bm_c[style="overflow: visible;"]', // 底部广告区域
+            '.bm_h', // 底部标题栏
+            '.pgbtn', // 翻页按钮
+            '.plc .pi', // 帖子信息区
+            '.plc .pct .mtw', // 帖子内容上方区域
+            '#tap_author_info', // 作者信息标签
+            '#tap_author_stat', // 作者统计标签
+            '.sign', // 签名档
+            '.rate', // 评分区域
+            '.plc .po', // 帖子下方操作区
+            '#postlistreply', // 回帖区域
+            '#relatelink', // 相关链接区域
+            '#subjump', // 主题跳转区域
+            '#custominfo_pmid', // 自定义信息区域
+            '#p_btn', // 按钮区域
+            '[id^="comment_"]', // 所有评论
+            '.area', // 区域
+            '#quickpost', // 快速回复区域
+            '.fastlg', // 快速登录区域
+            '#f_pst', // 发帖表单
+            '.bm.bw0', // 无边框板块
+            '.pob', // 帖子操作按钮
+            '.avatar', // 头像
+            '.authi', // 作者信息
+            '[id^="post_rate_div_"]', // 评分div
+            '#scrolltop', // 回到顶部按钮
+            '.plc > .po', // 帖子下方操作区
+            '.psth', // 帖子统计头
+            '.tns', // 统计区域
+            '#visit_counter', // 访问计数器
+            '.main_ad', // 主要广告
+            '.bm_c > [id^="postmessage_"] + div', // 帖子内容后的div
+            '.tip', // 提示框
+            '.paddtop', // 顶部填充
+            '.paddimg', // 图片填充
+            '.usercss', // 用户css
+            '.t_fsz > .bm_c > .pbn', // 帖子内容上方区域
+            '.bm_c font', // 特殊样式文字
+            '.postactions', // 帖子操作区
+            '.adext', // 扩展广告
+            '.adtxt', // 文字广告
+            '.side_ad', // 侧边广告
+            '.threadmod', // 主题模式
+            '.threadtools', // 主题工具
+            '.locked', // 锁定提示
+            '.attach_popup', // 附件弹窗
+            '.pattl', // 附件列表
+            '.attach_nopermission', // 附件无权限提示
+            '.postart', // 帖子起始
+            '.appext', // 应用扩展
+            '[style*="display:none"]' // 隐藏元素
+        ];
+        
+        elementsToRemove.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                el.remove();
+            });
+        });
+        
+        // 找到帖子主要内容
+        const postContent = document.querySelector('#postlist');
+        if (postContent) {
+            postContent.style.cssText = `
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
+                padding: 20px !important;
+                box-sizing: border-box !important;
+            `;
+            
+            // 移除帖子中每个回复的用户信息部分，只保留内容
+            document.querySelectorAll('#postlist > div').forEach(post => {
+                // 移除td.pls (用户信息侧栏)
+                const userInfo = post.querySelector('td.pls');
+                if (userInfo) userInfo.remove();
+                
+                // 调整内容区td.plc样式
+                const contentArea = post.querySelector('td.plc');
+                if (contentArea) {
+                    contentArea.style.cssText = `
+                        width: 100% !important;
+                        float: none !important;
+                        display: block !important;
+                        background-color: white !important;
+                        border: none !important;
+                        padding: 20px !important;
+                    `;
+                    
+                    // 移除帖子信息区域
+                    const postInfo = contentArea.querySelector('.pi');
+                    if (postInfo) postInfo.remove();
+                    
+                    // 移除额外的操作区域
+                    const operations = contentArea.querySelector('.po');
+                    if (operations) operations.remove();
+                }
+            });
+            
+            // 仅保留楼主的帖子内容
+            const allPosts = document.querySelectorAll('#postlist > div');
+            if (allPosts.length > 1) {
+                for (let i = 1; i < allPosts.length; i++) {
+                    allPosts[i].remove();
+                }
+            }
+            
+            // 优化帖子内容样式
+            document.querySelectorAll('.t_fsz').forEach(content => {
+                content.style.cssText = `
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    margin: 0 auto !important;
+                    padding: 0 !important;
+                    font-size: 16px !important;
+                    line-height: 1.6 !important;
+                    color: #333 !important;
+                `;
+            });
+            
+            // 优化图片显示
+            document.querySelectorAll('.t_fsz img').forEach(img => {
+                img.style.cssText = `
+                    max-width: 90% !important;
+                    height: auto !important;
+                    margin: 15px auto !important;
+                    display: block !important;
+                    border: none !important;
+                `;
+                img.setAttribute('loading', 'eager'); // 确保图片在打印时可见
+            });
+            
+            // 处理代码块
+            document.querySelectorAll('pre, code, .blockcode').forEach(codeBlock => {
+                codeBlock.style.cssText = `
+                    max-width: 90% !important;
+                    margin: 15px auto !important;
+                    white-space: pre-wrap !important;
+                    word-wrap: break-word !important;
+                    background-color: #f8f8f8 !important;
+                    border: 1px solid #ddd !important;
+                    padding: 15px !important;
+                    border-radius: 5px !important;
+                    font-family: Consolas, Monaco, monospace !important;
+                    overflow-x: auto !important;
+                `;
+            });
+        }
+        
+        // 添加打印样式
+        const printStyle = document.createElement('style');
+        printStyle.id = '52pojie-print-style';
+        printStyle.textContent = `
+            @media print {
+                body {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    font-size: 12pt !important;
+                    background: white !important;
+                }
+                
+                #postlist {
+                    width: 100% !important;
+                    max-width: 100% !important; 
+                    margin: 0 auto !important;
+                    padding: 0 !important;
+                }
+                
+                .t_fsz {
+                    font-size: 12pt !important;
+                    line-height: 1.5 !important;
+                }
+                
+                h1, h2, h3, h4, h5, h6 {
+                    page-break-after: avoid !important;
+                    page-break-inside: avoid !important;
+                }
+                
+                pre, code, .blockcode {
+                    page-break-inside: avoid !important;
+                    white-space: pre-wrap !important;
+                    word-break: break-word !important;
+                    background-color: #f8f8f8 !important;
+                    border: 1px solid #ddd !important;
+                    padding: 10px !important;
+                    -webkit-print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                
+                img {
+                    page-break-inside: avoid !important;
+                    max-width: 90% !important;
+                    height: auto !important;
+                    margin: 10px auto !important;
+                    display: block !important;
+                }
+                
+                a {
+                    text-decoration: underline !important;
+                    color: #000 !important;
+                }
+                
+                #article-print-panel {
+                    display: none !important;
+                }
+                
+                /* 添加页码 */
+                @page {
+                    margin: 1cm;
+                    @bottom-center {
+                        content: "第 " counter(page) " 页，共 " counter(pages) " 页";
+                    }
+                }
+                
+                /* 隐藏其他不必要元素 */
+                table, tr, td {
+                    border: none !important;
+                    background: none !important;
+                }
+            }
+        `;
+        document.head.appendChild(printStyle);
+        
+        // 显示成功消息
+        console.log('吾爱破解文章优化完成，准备打印或保存为PDF');
+        
+        handlePrintOrSave(autoPrint, savePdf, articleTitle);
+    }
+    
     // 处理打印或保存PDF
     function handlePrintOrSave(autoPrint = false, savePdf = false, articleTitle = '') {
         // 确保控制面板样式不受页面优化影响
@@ -963,6 +1219,8 @@
             optimizeJuejinPage(autoPrint, savePdf);
         } else if (isZhihu) {
             optimizeZhihuPage(autoPrint, savePdf);
+        } else if (is52pojie) {
+            optimize52pojiePage(autoPrint, savePdf);
         }
     }
     
