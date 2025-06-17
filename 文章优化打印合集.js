@@ -6,6 +6,7 @@
 // @author       Sherry
 // @match        *://*.csdn.net/*/article/details/*
 // @match        *://juejin.cn/post/*
+// @match        *://zhuanlan.zhihu.com/p/*
 // @grant        none
 // @run-at       document-end
 // @icon         https://tse1-mm.cn.bing.net/th/id/OIP-C.3iWufqIms_ccabhKcsM4GgHaHa?w=180&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7
@@ -20,6 +21,7 @@
     // 判断当前网站
     const isCSND = location.hostname.includes('csdn.net');
     const isJuejin = location.hostname.includes('juejin.cn');
+    const isZhihu = location.hostname.includes('zhuanlan.zhihu.com');
     
     // 网站相关配置 - 统一使用蓝色主题
     const siteConfig = {
@@ -32,11 +34,23 @@
             name: '掘金',
             color: '#1890ff',
             icon: '📄'
+        },
+        zhihu: {
+            name: '知乎',
+            color: '#1890ff',
+            icon: '📄'
         }
     };
     
     // 当前网站配置
-    const currentSite = isCSND ? siteConfig.csdn : siteConfig.juejin;
+    let currentSite;
+    if (isCSND) {
+        currentSite = siteConfig.csdn;
+    } else if (isJuejin) {
+        currentSite = siteConfig.juejin;
+    } else if (isZhihu) {
+        currentSite = siteConfig.zhihu;
+    }
     
     // 创建控制面板
     function createControlPanel() {
@@ -690,6 +704,156 @@
         handlePrintOrSave(autoPrint, savePdf, articleTitle);
     }
     
+    // 优化知乎专栏页面
+    function optimizeZhihuPage(autoPrint = false, savePdf = false) {
+        // 保存原始标题用于PDF文件名
+        const articleTitle = document.querySelector('.Post-Title')?.textContent || document.title;
+        
+        // 移除不必要元素
+        const elementsToRemove = [
+            '.ColumnPageHeader', // 顶部导航
+            '.Post-Header .ColumnPageHeader-Wrapper', // 顶部专栏信息
+            '.Post-SideActions', // 侧边操作栏
+            '.Post-NormalSub', // 文章底部信息
+            '.Post-NormalMain > div > div:last-child', // 底部推荐
+            '.Post-NormalMain > div > div.Card', // 卡片
+            '.Rewards', // 打赏
+            '.Comments-container', // 评论区
+            '.RichContent-actions', // 底部操作栏
+            '.Post-topicsAndReviewer', // 文章标签
+            '.Sticky--holder', // 顶部固定栏
+            '.Post-content + div', // 文章尾部
+            '.Catalog', // 目录
+            '#root > div > div:first-child' // 顶部导航
+        ];
+        
+        elementsToRemove.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                el.remove();
+            });
+        });
+        
+        // 美化文章内容
+        const postContent = document.querySelector('.Post-RichTextContainer');
+        if (postContent) {
+            postContent.style.cssText = `
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 20px !important;
+                margin: 0 auto !important;
+                box-sizing: border-box !important;
+            `;
+        }
+        
+        // 调整文章容器
+        const postMain = document.querySelector('.Post-Main');
+        if (postMain) {
+            postMain.style.cssText = `
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 20px !important;
+                margin: 0 auto !important;
+            `;
+        }
+        
+        // 美化标题
+        const postTitle = document.querySelector('.Post-Title');
+        if (postTitle) {
+            postTitle.style.cssText = `
+                font-size: 24px !important;
+                font-weight: bold !important;
+                margin-bottom: 20px !important;
+                text-align: center !important;
+            `;
+        }
+        
+        // 优化图片显示
+        document.querySelectorAll('.RichContent-inner img').forEach(img => {
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            img.style.margin = '10px auto';
+            img.style.display = 'block';
+            
+            // 确保图片在打印时可见
+            img.setAttribute('loading', 'eager');
+        });
+        
+        // 优化代码块显示
+        document.querySelectorAll('pre, code').forEach(el => {
+            el.style.maxWidth = '100%';
+            el.style.overflow = 'visible';
+            el.style.whiteSpace = 'pre-wrap';
+        });
+        
+        // 添加打印样式
+        const printStyle = document.createElement('style');
+        printStyle.id = 'zhihu-print-style';
+        printStyle.textContent = `
+            @media print {
+                body {
+                    margin: 0;
+                    padding: 0;
+                    font-size: 12pt;
+                }
+                
+                .Post-Title {
+                    font-size: 18pt !important;
+                    margin-bottom: 10px !important;
+                    page-break-after: avoid !important;
+                }
+                
+                .RichContent-inner {
+                    font-size: 12pt !important;
+                    line-height: 1.5 !important;
+                }
+                
+                h1, h2, h3, h4, h5, h6 {
+                    page-break-after: avoid !important;
+                    page-break-inside: avoid !important;
+                }
+                
+                pre, code, table {
+                    page-break-inside: avoid !important;
+                }
+                
+                img {
+                    page-break-inside: avoid !important;
+                    max-width: 100% !important;
+                }
+                
+                a {
+                    text-decoration: underline !important;
+                    color: #000 !important;
+                }
+                
+                #article-print-panel {
+                    display: none !important;
+                }
+                
+                /* 确保代码块在打印时有背景色 */
+                pre {
+                    background-color: #f6f8fa !important;
+                    border: 1px solid #ddd !important;
+                    padding: 10px !important;
+                    -webkit-print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                
+                /* 添加页码 */
+                @page {
+                    margin: 1cm;
+                    @bottom-center {
+                        content: "第 " counter(page) " 页，共 " counter(pages) " 页";
+                    }
+                }
+            }
+        `;
+        document.head.appendChild(printStyle);
+        
+        handlePrintOrSave(autoPrint, savePdf, articleTitle);
+    }
+    
     // 处理打印或保存PDF
     function handlePrintOrSave(autoPrint = false, savePdf = false, articleTitle = '') {
         // 确保控制面板样式不受页面优化影响
@@ -728,6 +892,8 @@
             optimizeCSDNPage(autoPrint, savePdf);
         } else if (isJuejin) {
             optimizeJuejinPage(autoPrint, savePdf);
+        } else if (isZhihu) {
+            optimizeZhihuPage(autoPrint, savePdf);
         }
     }
     
