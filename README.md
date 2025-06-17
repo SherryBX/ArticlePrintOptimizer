@@ -16,6 +16,10 @@
 - CSDN
 - 稀土掘金
 
+## 界面预览
+
+![界面预览](./images/preview.png)
+
 ## 使用方法
 
 1. 安装Tampermonkey或其他用户脚本管理器
@@ -23,9 +27,12 @@
 3. 访问支持的网站上的文章页面
 4. 点击右上角出现的悬浮窗按钮使用相应功能
 
-## 界面预览
+## 功能说明
 
-![界面预览](https://github.com/sherrys2025/ArticlePrintOptimizer/raw/main/preview.png)
+- **优化并打印**：自动移除干扰元素并调用浏览器打印功能
+- **保存为PDF**：优化页面并调用浏览器的打印为PDF功能
+- **仅优化页面**：只移除干扰元素，不进行打印操作
+- **恢复原页面**：恢复到原始网页状态
 
 ## 更新日志
 
@@ -42,6 +49,11 @@
 
 ### v1.0
 - 初始版本发布
+
+## 安装方法
+
+1. 首先安装 [Tampermonkey](https://www.tampermonkey.net/) 浏览器扩展
+2. 点击 [这里](https://github.com/SherryBX/ArticlePrintOptimizer/raw/main/文章优化打印合集.js) 安装脚本
 
 ## 许可证
 
