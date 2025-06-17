@@ -946,6 +946,7 @@
             '#pt', // 面包屑导航
             '#pgt', // 页面导航工具条
             '#footer', // 页脚
+            '#ft', // 底部页脚区域
             '.pgs.mtm.mbm.cl', // 分页导航
             '.bm.bml.pbn', // 帖子功能区
             '#postlist > .ad_column', // 广告列
