@@ -8,8 +8,6 @@
 
 **优化CSDN和稀土掘金文章页面，提供清爽阅读体验，一键优化打印与PDF导出**
 
-<img src="./images/preview.png" alt="界面预览" width="300"/>
-
 </div>
 
 ## ✨ 功能特点
