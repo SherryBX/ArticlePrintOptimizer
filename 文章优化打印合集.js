@@ -711,12 +711,12 @@
                             document.querySelector('.title-image')?.textContent ||
                             document.title;
         
-        // 移除不必要元素 - 精简版
+        // 移除不必要元素 - 简化为只删除指定元素
         const elementsToRemove = [
-            'header', // 顶部banner
+            'header', // 顶部横幅
             'div.Card.AuthorCard', // 作者卡片
-            'div.Comments-container.css-plbgu', // 评论区
-            'div.Post-Sub.Post-NormalSub' // 文章底部信息
+            'div.Comments-container.css-plbgu', // 评论容器
+            'div.Post-Sub.Post-NormalSub' // 底部相关信息
         ];
         
         elementsToRemove.forEach(selector => {
@@ -724,6 +724,34 @@
                 el.remove();
             });
         });
+        
+        // 优化文章容器
+        // 查找文章主体内容容器
+        let articleContainer = document.querySelector('.Post-RichTextContainer') || 
+                              document.querySelector('.RichContent-inner') || 
+                              document.querySelector('.Post-RichText');
+                              
+        if (articleContainer) {
+            articleContainer.style.cssText = `
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 20px !important;
+                margin: 0 auto !important;
+                box-sizing: border-box !important;
+            `;
+        }
+        
+        // 调整文章容器
+        const postMain = document.querySelector('.Post-Main') || 
+                         document.querySelector('.Post-NormalMain');
+        if (postMain) {
+            postMain.style.cssText = `
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 20px !important;
+                margin: 0 auto !important;
+            `;
+        }
         
         // 优化图片显示
         const imageSelectors = ['.RichText img', '.RichContent-inner img', '.Post-RichText img', '.content img'];
@@ -786,8 +814,12 @@
                     display: none !important;
                 }
                 
+                /* 添加页码 */
                 @page {
                     margin: 1cm;
+                    @bottom-center {
+                        content: "第 " counter(page) " 页，共 " counter(pages) " 页";
+                    }
                 }
             }
         `;
