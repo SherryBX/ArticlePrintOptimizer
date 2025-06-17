@@ -711,32 +711,12 @@
                             document.querySelector('.title-image')?.textContent ||
                             document.title;
         
-        // 移除不必要元素
+        // 移除不必要元素 - 精简版
         const elementsToRemove = [
-            '.ColumnPageHeader', // 顶部导航
-            '.Sticky.AppHeader', // 顶部固定导航
-            '.Post-SideActions', // 侧边操作栏
-            '.RichContent-actions', // 文章底部操作栏
-            '.Comments-container', // 评论区
-            '.Rewards', // 打赏
-            '.Post-topicsAndReviewer', // 文章标签
-            '.Catalog', // 目录
-            '.ContentItem-actions', // 内容项操作栏
-            '.ArticleItem-more', // 更多文章
-            '.Recommendations-Main', // 推荐内容
-            '.Post-Sub', // 文章次要内容
-            '.Post-NormalSub', // 文章底部信息
-            '.Post-Header .ColumnPageHeader-Wrapper', // 顶部专栏信息
-            '.AuthorInfo', // 作者信息
-            '.RelatedReadings', // 相关阅读
-            '.CornerButtons', // 角落按钮
-            '.ArticleInfo', // 文章信息
-            '.Sticky--bottom', // 底部固定元素
-            '.hotBanner', // 热门横幅
-            '#root > div > div:first-child', // 顶部元素
-            '.Post-content + div', // 文章尾部内容
-            '.Post-NormalMain > div > div:last-child', // 底部推荐
-            '.Post-NormalMain > div > div.Card' // 卡片
+            'header', // 顶部banner
+            'div.Card.AuthorCard', // 作者卡片
+            'div.Comments-container.css-plbgu', // 评论区
+            'div.Post-Sub.Post-NormalSub' // 文章底部信息
         ];
         
         elementsToRemove.forEach(selector => {
@@ -744,72 +724,6 @@
                 el.remove();
             });
         });
-        
-        // 删除知乎信息流
-        document.querySelectorAll('[role="feed"]').forEach(el => {
-            el.remove();
-        });
-        
-        // 删除广告
-        document.querySelectorAll('[data-za-detail-view-path-module="promotionCard"]').forEach(el => {
-            el.remove();
-        });
-        
-        // 隐藏底部菜单
-        document.querySelectorAll('div.BottomInfo').forEach(el => {
-            el.style.display = 'none';
-        });
-        
-        // 优化文章容器
-        // 查找文章主体内容容器
-        let articleContainer = document.querySelector('.Post-RichTextContainer') || 
-                              document.querySelector('.RichContent-inner') || 
-                              document.querySelector('.Post-RichText');
-                              
-        if (articleContainer) {
-            articleContainer.style.cssText = `
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 0 20px !important;
-                margin: 0 auto !important;
-                box-sizing: border-box !important;
-            `;
-        }
-        
-        // 调整文章容器
-        const postMain = document.querySelector('.Post-Main') || 
-                         document.querySelector('.Post-NormalMain');
-        if (postMain) {
-            postMain.style.cssText = `
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 20px !important;
-                margin: 0 auto !important;
-            `;
-        }
-        
-        // 找到内容区域
-        const contentArea = document.querySelector('.RichText');
-        if (contentArea) {
-            contentArea.style.cssText = `
-                max-width: 100% !important;
-                margin: 0 auto !important;
-                padding: 0 !important;
-            `;
-        }
-        
-        // 美化标题
-        const postTitle = document.querySelector('.Post-Title') || 
-                          document.querySelector('.ArticleHeader-title');
-        if (postTitle) {
-            postTitle.style.cssText = `
-                font-size: 24px !important;
-                font-weight: bold !important;
-                margin-bottom: 20px !important;
-                text-align: center !important;
-                padding-top: 20px !important;
-            `;
-        }
         
         // 优化图片显示
         const imageSelectors = ['.RichText img', '.RichContent-inner img', '.Post-RichText img', '.content img'];
@@ -821,14 +735,6 @@
                 img.style.display = 'block';
                 img.setAttribute('loading', 'eager'); // 确保图片在打印时可见
             });
-        });
-        
-        // 优化代码块显示
-        document.querySelectorAll('pre, code, .highlight').forEach(el => {
-            el.style.maxWidth = '100%';
-            el.style.overflow = 'visible';
-            el.style.whiteSpace = 'pre-wrap';
-            el.style.wordBreak = 'break-word';
         });
         
         // 添加打印样式
@@ -880,26 +786,8 @@
                     display: none !important;
                 }
                 
-                .ztext-math {
-                    max-width: 100% !important;
-                }
-                
-                /* 确保代码块在打印时有背景色 */
-                pre, .highlight {
-                    background-color: #f6f8fa !important;
-                    border: 1px solid #ddd !important;
-                    padding: 10px !important;
-                    -webkit-print-color-adjust: exact !important;
-                    color-adjust: exact !important;
-                    print-color-adjust: exact !important;
-                }
-                
-                /* 添加页码 */
                 @page {
                     margin: 1cm;
-                    @bottom-center {
-                        content: "第 " counter(page) " 页，共 " counter(pages) " 页";
-                    }
                 }
             }
         `;
