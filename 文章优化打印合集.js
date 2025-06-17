@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         文章优化打印合集
 // @namespace    http://tampermonkey.net/
-// @version      3.0
-// @description  优化CSDN和稀土掘金文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
+// @version      3.1
+// @description  优化CSDN、稀土掘金和知乎专栏文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
 // @author       Sherry
 // @match        *://*.csdn.net/*/article/details/*
 // @match        *://juejin.cn/post/*
@@ -707,24 +707,36 @@
     // 优化知乎专栏页面
     function optimizeZhihuPage(autoPrint = false, savePdf = false) {
         // 保存原始标题用于PDF文件名
-        const articleTitle = document.querySelector('.Post-Title')?.textContent || document.title;
+        const articleTitle = document.querySelector('h1.Post-Title')?.textContent || 
+                            document.querySelector('.title-image')?.textContent ||
+                            document.title;
         
         // 移除不必要元素
         const elementsToRemove = [
             '.ColumnPageHeader', // 顶部导航
-            '.Post-Header .ColumnPageHeader-Wrapper', // 顶部专栏信息
+            '.Sticky.AppHeader', // 顶部固定导航
             '.Post-SideActions', // 侧边操作栏
-            '.Post-NormalSub', // 文章底部信息
-            '.Post-NormalMain > div > div:last-child', // 底部推荐
-            '.Post-NormalMain > div > div.Card', // 卡片
-            '.Rewards', // 打赏
+            '.RichContent-actions', // 文章底部操作栏
             '.Comments-container', // 评论区
-            '.RichContent-actions', // 底部操作栏
+            '.Rewards', // 打赏
             '.Post-topicsAndReviewer', // 文章标签
-            '.Sticky--holder', // 顶部固定栏
-            '.Post-content + div', // 文章尾部
             '.Catalog', // 目录
-            '#root > div > div:first-child' // 顶部导航
+            '.ContentItem-actions', // 内容项操作栏
+            '.ArticleItem-more', // 更多文章
+            '.Recommendations-Main', // 推荐内容
+            '.Post-Sub', // 文章次要内容
+            '.Post-NormalSub', // 文章底部信息
+            '.Post-Header .ColumnPageHeader-Wrapper', // 顶部专栏信息
+            '.AuthorInfo', // 作者信息
+            '.RelatedReadings', // 相关阅读
+            '.CornerButtons', // 角落按钮
+            '.ArticleInfo', // 文章信息
+            '.Sticky--bottom', // 底部固定元素
+            '.hotBanner', // 热门横幅
+            '#root > div > div:first-child', // 顶部元素
+            '.Post-content + div', // 文章尾部内容
+            '.Post-NormalMain > div > div:last-child', // 底部推荐
+            '.Post-NormalMain > div > div.Card' // 卡片
         ];
         
         elementsToRemove.forEach(selector => {
@@ -733,10 +745,29 @@
             });
         });
         
-        // 美化文章内容
-        const postContent = document.querySelector('.Post-RichTextContainer');
-        if (postContent) {
-            postContent.style.cssText = `
+        // 删除知乎信息流
+        document.querySelectorAll('[role="feed"]').forEach(el => {
+            el.remove();
+        });
+        
+        // 删除广告
+        document.querySelectorAll('[data-za-detail-view-path-module="promotionCard"]').forEach(el => {
+            el.remove();
+        });
+        
+        // 隐藏底部菜单
+        document.querySelectorAll('div.BottomInfo').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        // 优化文章容器
+        // 查找文章主体内容容器
+        let articleContainer = document.querySelector('.Post-RichTextContainer') || 
+                              document.querySelector('.RichContent-inner') || 
+                              document.querySelector('.Post-RichText');
+                              
+        if (articleContainer) {
+            articleContainer.style.cssText = `
                 width: 100% !important;
                 max-width: 100% !important;
                 padding: 0 20px !important;
@@ -746,7 +777,8 @@
         }
         
         // 调整文章容器
-        const postMain = document.querySelector('.Post-Main');
+        const postMain = document.querySelector('.Post-Main') || 
+                         document.querySelector('.Post-NormalMain');
         if (postMain) {
             postMain.style.cssText = `
                 width: 100% !important;
@@ -756,33 +788,47 @@
             `;
         }
         
+        // 找到内容区域
+        const contentArea = document.querySelector('.RichText');
+        if (contentArea) {
+            contentArea.style.cssText = `
+                max-width: 100% !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+            `;
+        }
+        
         // 美化标题
-        const postTitle = document.querySelector('.Post-Title');
+        const postTitle = document.querySelector('.Post-Title') || 
+                          document.querySelector('.ArticleHeader-title');
         if (postTitle) {
             postTitle.style.cssText = `
                 font-size: 24px !important;
                 font-weight: bold !important;
                 margin-bottom: 20px !important;
                 text-align: center !important;
+                padding-top: 20px !important;
             `;
         }
         
         // 优化图片显示
-        document.querySelectorAll('.RichContent-inner img').forEach(img => {
-            img.style.maxWidth = '100%';
-            img.style.height = 'auto';
-            img.style.margin = '10px auto';
-            img.style.display = 'block';
-            
-            // 确保图片在打印时可见
-            img.setAttribute('loading', 'eager');
+        const imageSelectors = ['.RichText img', '.RichContent-inner img', '.Post-RichText img', '.content img'];
+        imageSelectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(img => {
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+                img.style.margin = '10px auto';
+                img.style.display = 'block';
+                img.setAttribute('loading', 'eager'); // 确保图片在打印时可见
+            });
         });
         
         // 优化代码块显示
-        document.querySelectorAll('pre, code').forEach(el => {
+        document.querySelectorAll('pre, code, .highlight').forEach(el => {
             el.style.maxWidth = '100%';
             el.style.overflow = 'visible';
             el.style.whiteSpace = 'pre-wrap';
+            el.style.wordBreak = 'break-word';
         });
         
         // 添加打印样式
@@ -791,18 +837,19 @@
         printStyle.textContent = `
             @media print {
                 body {
-                    margin: 0;
-                    padding: 0;
-                    font-size: 12pt;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    font-size: 12pt !important;
                 }
                 
-                .Post-Title {
+                .Post-Title, .ArticleHeader-title {
                     font-size: 18pt !important;
                     margin-bottom: 10px !important;
                     page-break-after: avoid !important;
+                    text-align: center !important;
                 }
                 
-                .RichContent-inner {
+                .RichText, .RichContent-inner {
                     font-size: 12pt !important;
                     line-height: 1.5 !important;
                 }
@@ -812,13 +859,16 @@
                     page-break-inside: avoid !important;
                 }
                 
-                pre, code, table {
+                pre, code, table, .highlight {
                     page-break-inside: avoid !important;
+                    white-space: pre-wrap !important;
+                    word-break: break-word !important;
                 }
                 
                 img {
                     page-break-inside: avoid !important;
                     max-width: 100% !important;
+                    height: auto !important;
                 }
                 
                 a {
@@ -830,8 +880,12 @@
                     display: none !important;
                 }
                 
+                .ztext-math {
+                    max-width: 100% !important;
+                }
+                
                 /* 确保代码块在打印时有背景色 */
-                pre {
+                pre, .highlight {
                     background-color: #f6f8fa !important;
                     border: 1px solid #ddd !important;
                     padding: 10px !important;
@@ -850,6 +904,9 @@
             }
         `;
         document.head.appendChild(printStyle);
+        
+        // 显示成功消息
+        console.log('知乎文章优化完成，准备打印或保存为PDF');
         
         handlePrintOrSave(autoPrint, savePdf, articleTitle);
     }
