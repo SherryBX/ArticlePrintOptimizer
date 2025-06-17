@@ -1089,14 +1089,38 @@
                     margin: 15px auto !important;
                     white-space: pre-wrap !important;
                     word-wrap: break-word !important;
-                    background-color: #f8f8f8 !important;
-                    border: 1px solid #ddd !important;
+                    background-color: #1e1e1e !important;
+                    color: #d4d4d4 !important;
+                    border: 1px solid #333 !important;
                     padding: 15px !important;
                     border-radius: 5px !important;
                     font-family: Consolas, Monaco, monospace !important;
                     overflow-x: auto !important;
                 `;
+                
+                // 调整代码块内部所有文本颜色
+                const allElements = codeBlock.querySelectorAll('*');
+                allElements.forEach(el => {
+                    el.style.color = '#d4d4d4';
+                });
             });
+            
+            // 处理打印时的代码样式
+            const codeColorStyle = document.createElement('style');
+            codeColorStyle.textContent = `
+                pre, code, .blockcode {
+                    background-color: #1e1e1e !important;
+                    color: #d4d4d4 !important;
+                    -webkit-print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                
+                pre *, code *, .blockcode * {
+                    color: #d4d4d4 !important;
+                }
+            `;
+            document.head.appendChild(codeColorStyle);
         }
         
         // 添加打印样式
@@ -1132,8 +1156,9 @@
                     page-break-inside: avoid !important;
                     white-space: pre-wrap !important;
                     word-break: break-word !important;
-                    background-color: #f8f8f8 !important;
-                    border: 1px solid #ddd !important;
+                    background-color: #1e1e1e !important;
+                    color: #d4d4d4 !important;
+                    border: 1px solid #333 !important;
                     padding: 10px !important;
                     -webkit-print-color-adjust: exact !important;
                     color-adjust: exact !important;
