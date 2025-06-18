@@ -24,7 +24,7 @@
 ## 🌟 界面展示
 
 <div align="center">
-<img src="./images/preview.png" alt="界面预览" width="350"/>
+<img src="https://gitee.com/SherryBX/img/raw/master/202506181540143.png" alt="界面预览" width="350"/>
 </div>
 
 ## 📌 支持网站

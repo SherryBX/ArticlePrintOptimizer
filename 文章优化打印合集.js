@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         文章优化打印合集
 // @namespace    http://tampermonkey.net/
-// @version      3.2
-// @description  优化CSDN、稀土掘金、知乎专栏和吾爱论坛文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
+// @version      3.4
+// @description  优化CSDN、稀土掘金、知乎专栏、微信公众号和吾爱论坛文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
 // @author       Sherry
 // @match        *://*.csdn.net/*/article/details/*
 // @match        *://juejin.cn/post/*
 // @match        *://zhuanlan.zhihu.com/p/*
 // @match        *://www.52pojie.cn/thread-*-*-*.html
+// @match        *://mp.weixin.qq.com/s/*
 // @grant        none
 // @run-at       document-end
 // @icon         https://tse1-mm.cn.bing.net/th/id/OIP-C.3iWufqIms_ccabhKcsM4GgHaHa?w=180&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7
@@ -24,6 +25,7 @@
     const isJuejin = location.hostname.includes('juejin.cn');
     const isZhihu = location.hostname.includes('zhuanlan.zhihu.com');
     const is52pojie = location.hostname.includes('52pojie.cn') && location.pathname.includes('/thread-');
+    const isWeixin = location.hostname.includes('mp.weixin.qq.com') && location.pathname.includes('/s/');
     
     // 网站相关配置 - 统一使用蓝色主题
     const siteConfig = {
@@ -46,6 +48,11 @@
             name: '吾爱破解',
             color: '#1890ff',
             icon: '📄'
+        },
+        weixin: {
+            name: '微信公众号',
+            color: '#1890ff',
+            icon: '📄'
         }
     };
     
@@ -59,6 +66,8 @@
         currentSite = siteConfig.zhihu;
     } else if (is52pojie) {
         currentSite = siteConfig.pojie;
+    } else if (isWeixin) {
+        currentSite = siteConfig.weixin;
     }
     
     // 创建控制面板
@@ -1206,6 +1215,84 @@
         handlePrintOrSave(autoPrint, savePdf, articleTitle);
     }
     
+    // 优化微信公众号文章页面
+    function optimizeWeixinPage(autoPrint = false, savePdf = false) {
+        // 获取文章标题
+        const articleTitle = document.querySelector('#activity-name')?.innerText?.trim() || '微信公众号文章';
+        
+        // 只删除指定元素
+        const elementsToRemove = [
+            '.rich_media_tool_area',       // 工具区域
+            '.bottom_bar_interaction_wrp'   // 底部交互区域
+        ];
+        
+        elementsToRemove.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                el.remove();
+            });
+        });
+        
+        // 为代码块添加打印时的背景色样式
+        const codeBlockStyle = document.createElement('style');
+        codeBlockStyle.textContent = `
+            pre, code, .code-snippet {
+                background-color: #1e1e1e !important;
+                color: #d4d4d4 !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            pre *, code *, .code-snippet * {
+                color: #d4d4d4 !important;
+            }
+        `;
+        document.head.appendChild(codeBlockStyle);
+        
+        // 添加打印样式
+        const printStyle = document.createElement('style');
+        printStyle.id = 'weixin-print-style';
+        printStyle.textContent = `
+            @media print {
+                body {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                
+                #article-print-panel {
+                    display: none !important;
+                }
+                
+                /* 确保代码块背景色在打印时显示 */
+                pre, code, .code-snippet {
+                    background-color: #1e1e1e !important;
+                    color: #d4d4d4 !important;
+                    -webkit-print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                
+                pre *, code *, .code-snippet * {
+                    color: #d4d4d4 !important;
+                }
+                
+                /* 添加页码 */
+                @page {
+                    margin: 1cm;
+                    @bottom-center {
+                        content: "第 " counter(page) " 页，共 " counter(pages) " 页";
+                    }
+                }
+            }
+        `;
+        document.head.appendChild(printStyle);
+        
+        // 显示成功消息
+        console.log('微信公众号文章优化完成，准备打印或保存为PDF');
+        
+        handlePrintOrSave(autoPrint, savePdf, articleTitle);
+    }
+    
     // 处理打印或保存PDF
     function handlePrintOrSave(autoPrint = false, savePdf = false, articleTitle = '') {
         // 确保控制面板样式不受页面优化影响
@@ -1248,6 +1335,8 @@
             optimizeZhihuPage(autoPrint, savePdf);
         } else if (is52pojie) {
             optimize52pojiePage(autoPrint, savePdf);
+        } else if (isWeixin) {
+            optimizeWeixinPage(autoPrint, savePdf);
         }
     }
     
