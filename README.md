@@ -2,11 +2,11 @@
 
 <div align="center">
 
-![版本](https://img.shields.io/badge/版本-3.6-blue)
+![版本](https://img.shields.io/badge/版本-3.7-blue)
 ![License](https://img.shields.io/badge/许可证-MIT-green)
-![支持网站](https://img.shields.io/badge/支持网站-CSDN%20%7C%20掘金%20%7C%20知乎%20%7C%20微信%20%7C%20看雪%20%7C%20吾爱-orange)
+![支持网站](https://img.shields.io/badge/支持网站-CSDN%20%7C%20掘金%20%7C%20知乎%20%7C%20微信%20%7C%20看雪%20%7C%20吾爱%20%7C%20先知-orange)
 
-**优化CSDN、稀土掘金、知乎专栏、微信公众号、看雪论坛和吾爱论坛文章页面，提供清爽阅读体验，一键优化打印与PDF导出**
+**优化CSDN、稀土掘金、知乎专栏、微信公众号、看雪论坛、吾爱论坛和阿里云先知社区文章页面，提供清爽阅读体验，一键优化打印与PDF导出**
 
 简体中文 | [English](./.github/README_EN.md)
 
@@ -37,6 +37,7 @@
 | **微信公众号** | ✅ |
 | **看雪论坛** | ✅ |
 | **吾爱破解论坛** | ✅ |
+| **阿里云先知社区** | ✅ |
 
 ## 🚀 安装方法
 
@@ -46,7 +47,7 @@
 
 ## 💡 使用方法
 
-1. 安装脚本后访问 [CSDN](https://blog.csdn.net/)、[稀土掘金](https://juejin.cn/)、[知乎专栏](https://zhuanlan.zhihu.com/)、[微信公众号](https://mp.weixin.qq.com/)、[看雪论坛](https://bbs.kanxue.com/) 或 [吾爱破解论坛](https://www.52pojie.cn/) 的文章页面
+1. 安装脚本后访问 [CSDN](https://blog.csdn.net/)、[稀土掘金](https://juejin.cn/)、[知乎专栏](https://zhuanlan.zhihu.com/)、[微信公众号](https://mp.weixin.qq.com/)、[看雪论坛](https://bbs.kanxue.com/)、[吾爱破解论坛](https://www.52pojie.cn/) 或 [阿里云先知社区](https://xz.aliyun.com/) 的文章页面
 2. 页面右上角会出现悬浮控制面板
 3. 选择需要的功能：
 
@@ -77,6 +78,11 @@
 
 ## 📝 更新日志
 
+### v3.7
+- 🆕 新增阿里云先知社区文章支持
+- 📝 优化技术文章的阅读体验
+- 💻 改进代码块和表格的显示效果
+
 ### v3.6
 - 🛠️ 修复看雪论坛代码框显示问题
 - ⚙️ 优化代码块行号显示样式
@@ -85,7 +91,7 @@
 ### v3.5
 - 🆕 新增看雪论坛文章支持
 - 💻 优化代码块在打印时的显示效果
-- �� 支持看雪论坛技术文章的阅读和打印
+- 🎨 支持看雪论坛技术文章的阅读和打印
 
 ### v3.4
 - 🆕 新增微信公众号文章支持

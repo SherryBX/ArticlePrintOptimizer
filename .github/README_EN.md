@@ -2,11 +2,11 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.6-blue)
+![Version](https://img.shields.io/badge/version-3.7-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Supported Sites](https://img.shields.io/badge/supports-CSDN%20%7C%20Juejin%20%7C%20Zhihu%20%7C%20WeChat%20%7C%20Kanxue%20%7C%2052pojie-orange)
+![Supported Sites](https://img.shields.io/badge/supports-CSDN%20%7C%20Juejin%20%7C%20Zhihu%20%7C%20WeChat%20%7C%20Kanxue%20%7C%2052pojie%20%7C%20Xianzhi-orange)
 
-**Optimize CSDN, Juejin, Zhihu, WeChat official accounts, Kanxue forum and 52pojie forum articles for a clean reading experience, one-click printing and PDF export**
+**Optimize CSDN, Juejin, Zhihu, WeChat official accounts, Kanxue forum, 52pojie forum and Aliyun Xianzhi community articles for a clean reading experience, one-click printing and PDF export**
 
 [简体中文](../README.md) | English
 
@@ -31,6 +31,7 @@
 | **WeChat Official Accounts** | ✅ |
 | **Kanxue Forum** | ✅ |
 | **52pojie Forum** | ✅ |
+| **Aliyun Xianzhi Community** | ✅ |
 
 ## 🚀 Installation
 
@@ -40,7 +41,7 @@
 
 ## 💡 How to Use
 
-1. After installation, visit article pages on [CSDN](https://blog.csdn.net/), [Juejin](https://juejin.cn/), [Zhihu](https://zhuanlan.zhihu.com/), or [52pojie Forum](https://www.52pojie.cn/)
+1. After installation, visit article pages on [CSDN](https://blog.csdn.net/), [Juejin](https://juejin.cn/), [Zhihu](https://zhuanlan.zhihu.com/), [WeChat](https://mp.weixin.qq.com/), [Kanxue Forum](https://bbs.kanxue.com/), [52pojie Forum](https://www.52pojie.cn/) or [Aliyun Xianzhi](https://xz.aliyun.com/)
 2. A floating control panel will appear in the top right corner of the page
 3. Choose the desired function:
 
@@ -69,7 +70,12 @@ The script automatically removes the following elements:
 - Ensures images display properly when printing
 - Adds page numbers (when printing)
 
-## 📝 Changelog
+## �� Changelog
+
+### v3.7
+- 🆕 Added support for Aliyun Xianzhi community articles
+- 📝 Enhanced reading experience for technical articles
+- 💻 Improved display of code blocks and tables
 
 ### v3.6
 - 🛠️ Fixed code block display issues in Kanxue forum

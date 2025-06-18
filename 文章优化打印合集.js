@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         文章优化打印合集
 // @namespace    http://tampermonkey.net/
-// @version      3.6
-// @description  优化CSDN、稀土掘金、知乎专栏、微信公众号、看雪论坛和吾爱论坛文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
+// @version      3.7
+// @description  优化CSDN、稀土掘金、知乎专栏、微信公众号、看雪论坛、吾爱论坛和阿里云先知社区文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
 // @author       Sherry
 // @match        *://*.csdn.net/*/article/details/*
 // @match        *://juejin.cn/post/*
@@ -10,6 +10,7 @@
 // @match        *://www.52pojie.cn/thread-*-*-*.html
 // @match        *://mp.weixin.qq.com/s/*
 // @match        *://bbs.kanxue.com/thread-*.htm*
+// @match        *://xz.aliyun.com/*
 // @grant        none
 // @run-at       document-end
 // @icon         https://tse1-mm.cn.bing.net/th/id/OIP-C.3iWufqIms_ccabhKcsM4GgHaHa?w=180&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7
@@ -28,6 +29,7 @@
     const is52pojie = location.hostname.includes('52pojie.cn') && location.pathname.includes('/thread-');
     const isWeixin = location.hostname.includes('mp.weixin.qq.com') && location.pathname.includes('/s/');
     const isKanxue = location.hostname.includes('bbs.kanxue.com') && location.pathname.includes('/thread-');
+    const isXianzhi = location.hostname.includes('xz.aliyun.com') && location.pathname.includes('/t/');
     
     // 网站相关配置 - 统一使用蓝色主题
     const siteConfig = {
@@ -60,6 +62,11 @@
             name: '看雪论坛',
             color: '#1890ff',
             icon: '📄'
+        },
+        xianzhi: {
+            name: '先知社区',
+            color: '#1890ff',
+            icon: '📄'
         }
     };
     
@@ -77,6 +84,8 @@
         currentSite = siteConfig.weixin;
     } else if (isKanxue) {
         currentSite = siteConfig.kanxue;
+    } else if (isXianzhi) {
+        currentSite = siteConfig.xianzhi;
     }
     
     // 创建控制面板
@@ -350,7 +359,7 @@
         
         // 添加版权信息
         const footer = document.createElement('div');
-        footer.textContent = '文章优化打印合集 v3.6';
+        footer.textContent = '文章优化打印合集 v3.7';
         footer.style.cssText = `
             text-align: center !important;
             font-size: 12px !important;
@@ -1332,7 +1341,6 @@
             '#j_p_postlist > div:not(:first-child)', // 只保留原帖
             '.p_reply', // 回复工具条
             '#umenu', // 用户菜单
-            '#toptb', // 顶部工具条
             '#wp > .wp.a_h', // 顶部隐藏区域
             '#nv_forum + div', // 导航下方不必要的div
             '.pgt', // 分页导航工具
@@ -1628,6 +1636,240 @@
         }
     }
     
+    // 优化先知社区文章页面
+    function optimizeXianzhiPage(autoPrint = false, savePdf = false) {
+        // 获取文章标题
+        const articleTitle = document.querySelector('.detail-title')?.textContent?.trim() || document.title.replace(' - 先知社区', '');
+        
+        // 创建新的容器
+        const newContainer = document.createElement('div');
+        newContainer.id = 'xianzhi-center-wrapper';
+        newContainer.style.cssText = `
+            max-width: 800px !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+            font-size: 16px !important;
+            line-height: 1.8 !important;
+            color: #333 !important;
+            background-color: white !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        `;
+
+        // 创建标题
+        const titleElement = document.createElement('h1');
+        titleElement.textContent = articleTitle;
+        titleElement.style.cssText = `
+            font-size: 28px !important;
+            font-weight: 600 !important;
+            margin-bottom: 16px !important;
+            color: #000 !important;
+            text-align: center !important;
+            line-height: 1.4 !important;
+        `;
+        newContainer.appendChild(titleElement);
+
+        // 创建作者和发布时间元素
+        const authorContainer = document.createElement('div');
+        authorContainer.style.cssText = `
+            display: flex !important;
+            justify-content: center !important;
+            margin-bottom: 24px !important;
+            color: #666 !important;
+            font-size: 14px !important;
+            border-bottom: 1px solid #eee !important;
+            padding-bottom: 16px !important;
+        `;
+        
+        const authorName = document.querySelector('.author-name')?.textContent?.trim() || '佚名';
+        const publishTime = document.querySelector('.time')?.textContent?.trim() || '';
+        
+        authorContainer.innerHTML = `
+            <span style="margin-right: 16px !important;">作者：${authorName}</span>
+            <span>发布时间：${publishTime}</span>
+        `;
+        newContainer.appendChild(authorContainer);
+
+        // 克隆文章内容
+        const contentElement = document.querySelector('.detail-content');
+        if (contentElement) {
+            const contentClone = contentElement.cloneNode(true);
+            
+            // 处理图片，确保图片正常显示
+            const images = contentClone.querySelectorAll('img');
+            images.forEach(img => {
+                // 确保图片来源可靠
+                if (img.src) {
+                    img.style.cssText = `
+                        max-width: 100% !important;
+                        height: auto !important;
+                        margin: 10px auto !important;
+                        display: block !important;
+                    `;
+                }
+            });
+
+            // 处理代码块，确保代码高亮和行号显示正常
+            const codeBlocks = contentClone.querySelectorAll('pre, code, .hljs');
+            codeBlocks.forEach(block => {
+                block.style.cssText = `
+                    background-color: #f6f8fa !important;
+                    padding: 16px !important;
+                    border-radius: 5px !important;
+                    font-family: Consolas, Monaco, 'Andale Mono', monospace !important;
+                    font-size: 14px !important;
+                    line-height: 1.5 !important;
+                    overflow-x: auto !important;
+                    white-space: pre !important;
+                    word-wrap: normal !important;
+                    max-width: 100% !important;
+                    margin: 16px 0 !important;
+                    border: 1px solid #e1e4e8 !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                `;
+            });
+
+            // 处理行号显示
+            const lineNumbers = contentClone.querySelectorAll('.gutter, .line-numbers');
+            lineNumbers.forEach(lineNum => {
+                lineNum.style.cssText = `
+                    background-color: #f6f8fa !important;
+                    color: #999 !important;
+                    border-right: 1px solid #ddd !important;
+                    padding-right: 10px !important;
+                    text-align: right !important;
+                    margin-right: 10px !important;
+                    display: table-cell !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                    user-select: none !important;
+                `;
+            });
+
+            // 处理链接，确保链接样式一致
+            const links = contentClone.querySelectorAll('a');
+            links.forEach(link => {
+                link.style.cssText = `
+                    color: #0366d6 !important;
+                    text-decoration: none !important;
+                `;
+            });
+
+            // 处理标题样式
+            const headings = contentClone.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            headings.forEach(heading => {
+                heading.style.cssText = `
+                    margin-top: 24px !important;
+                    margin-bottom: 16px !important;
+                    font-weight: 600 !important;
+                    line-height: 1.25 !important;
+                    color: #000 !important;
+                `;
+            });
+
+            // 处理表格，确保表格正常显示
+            const tables = contentClone.querySelectorAll('table');
+            tables.forEach(table => {
+                table.style.cssText = `
+                    width: 100% !important;
+                    border-collapse: collapse !important;
+                    margin-bottom: 20px !important;
+                    overflow-x: auto !important;
+                    display: block !important;
+                `;
+
+                const ths = table.querySelectorAll('th');
+                ths.forEach(th => {
+                    th.style.cssText = `
+                        background-color: #f6f8fa !important;
+                        padding: 8px !important;
+                        border: 1px solid #ddd !important;
+                        font-weight: 600 !important;
+                        text-align: left !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    `;
+                });
+
+                const tds = table.querySelectorAll('td');
+                tds.forEach(td => {
+                    td.style.cssText = `
+                        padding: 8px !important;
+                        border: 1px solid #ddd !important;
+                    `;
+                });
+            });
+
+            newContainer.appendChild(contentClone);
+        }
+
+        // 删除不必要元素
+        document.querySelectorAll('#header, .nav, .sidebar, #footer, .comment, .recommend, .advertisement, .author-info').forEach(element => {
+            if (element) element.remove();
+        });
+
+        // 清空页面内容并添加新容器
+        document.body.innerHTML = '';
+        document.body.style.cssText = `
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: white !important;
+        `;
+        document.body.appendChild(newContainer);
+
+        // 添加版权信息
+        const footer = document.createElement('div');
+        footer.textContent = '文章优化打印合集 v3.7 | 先知社区';
+        footer.style.cssText = `
+            text-align: center !important;
+            font-size: 12px !important;
+            color: rgba(0, 0, 0, 0.45) !important;
+            padding: 16px 20px !important;
+            margin-top: 32px !important;
+            border-top: 1px solid #eee !important;
+        `;
+        newContainer.appendChild(footer);
+
+        // 动态添加打印样式
+        const printStyle = document.createElement('style');
+        printStyle.textContent = `
+            @media print {
+                body, html {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    background-color: white !important;
+                }
+                #xianzhi-center-wrapper {
+                    box-shadow: none !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                }
+                @page {
+                    margin: 1cm !important;
+                }
+                .hljs, pre, code {
+                    overflow-x: hidden !important;
+                    white-space: pre-wrap !important;
+                    word-break: break-word !important;
+                }
+                a {
+                    text-decoration: none !important;
+                }
+                a[href]:after {
+                    content: " (" attr(href) ")" !important;
+                    font-size: 12px !important;
+                    color: #666 !important;
+                    word-break: break-all !important;
+                }
+            }
+        `;
+        document.head.appendChild(printStyle);
+
+        // 处理打印或保存
+        handlePrintOrSave(autoPrint, savePdf, articleTitle);
+    }
+    
     // 处理打印或保存PDF
     function handlePrintOrSave(autoPrint = false, savePdf = false, articleTitle = '') {
         // 确保控制面板样式不受页面优化影响
@@ -1681,6 +1923,8 @@
             optimizeWeixinPage(autoPrint, savePdf);
         } else if (isKanxue) {
             optimizeKanxuePage(autoPrint, savePdf);
+        } else if (isXianzhi) {
+            optimizeXianzhiPage(autoPrint, savePdf);
         }
     }
     
