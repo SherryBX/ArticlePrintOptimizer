@@ -128,12 +128,12 @@
             top: 20px !important;
             right: 20px !important;
             background-color: #fff !important;
-            border-radius: 8px !important;
+            border-radius: 12px !important;
             box-shadow: 0 6px 16px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.1) !important;
             z-index: 9999 !important;
             font-size: 14px !important;
             cursor: move !important;
-            width: 240px !important;
+            width: 200px !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
             transition: all 0.3s ease !important;
@@ -145,14 +145,14 @@
         titleBar.style.cssText = `
             background: #1890ff !important;
             color: white !important;
-            padding: 14px 16px !important;
+            padding: 12px 16px !important;
             font-weight: 500 !important;
             font-size: 16px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            border-top-left-radius: 8px !important;
-            border-top-right-radius: 8px !important;
+            border-top-left-radius: 12px !important;
+            border-top-right-radius: 12px !important;
             cursor: move !important;
             user-select: none !important;
         `;
@@ -235,10 +235,10 @@
         // 创建按钮容器
         const buttonsContainer = document.createElement('div');
         buttonsContainer.style.cssText = `
-            padding: 20px !important;
+            padding: 16px !important;
             display: flex !important;
             flex-direction: column !important;
-            gap: 14px !important;
+            gap: 10px !important;
         `;
         
         // 创建按钮函数
@@ -246,7 +246,7 @@
             const buttonWrapper = document.createElement('div');
             buttonWrapper.style.cssText = `
                 width: 100% !important;
-                height: 44px !important;
+                height: 42px !important;
                 position: relative !important;
             `;
             
@@ -255,11 +255,11 @@
                 background-color: ${bgColor} !important;
                 color: white !important;
                 border: none !important;
-                border-radius: 6px !important;
+                border-radius: 8px !important;
                 cursor: pointer !important;
                 width: 100% !important;
                 height: 100% !important;
-                font-size: 15px !important;
+                font-size: 14px !important;
                 font-weight: 500 !important;
                 transition: all 0.2s !important;
                 box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
@@ -275,8 +275,8 @@
             iconSpan.innerHTML = icon;
             iconSpan.style.cssText = `
                 display: inline-block !important;
-                width: 20px !important;
-                margin-right: 10px !important;
+                width: 18px !important;
+                margin-right: 8px !important;
                 text-align: center !important;
             `;
             
@@ -365,7 +365,7 @@
             text-align: center !important;
             font-size: 12px !important;
             color: rgba(0, 0, 0, 0.45) !important;
-            padding: 0 20px 16px !important;
+            padding: 0 16px 12px !important;
         `;
         
         // 组装面板
@@ -1673,6 +1673,13 @@
                 if (element) element.remove();
             });
         });
+        
+        // 为left_container添加样式
+        const leftContainer = document.querySelector('.left_container');
+        if (leftContainer) {
+            leftContainer.style.position = 'absolute';
+            leftContainer.style.left = '';
+        }
         
         // 调整主体内容样式
         const mainContent = document.querySelector('.detail-content') || 
