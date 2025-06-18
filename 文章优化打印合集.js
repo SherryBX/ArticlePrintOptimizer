@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         文章优化打印合集
 // @namespace    http://tampermonkey.net/
-// @version      3.7.1
+// @version      3.7.2
 // @description  优化CSDN、稀土掘金、知乎专栏、微信公众号、看雪论坛、吾爱论坛和阿里云先知社区文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
 // @author       Sherry
 // @match        *://*.csdn.net/*/article/details/*
@@ -360,7 +360,7 @@
         
         // 添加版权信息
         const footer = document.createElement('div');
-        footer.textContent = '文章优化打印合集 v3.7.1';
+        footer.textContent = '文章优化打印合集 v3.7.2';
         footer.style.cssText = `
             text-align: center !important;
             font-size: 12px !important;
@@ -1639,95 +1639,60 @@
     
     // 优化先知社区文章页面
     function optimizeXianzhiPage(autoPrint = false, savePdf = false) {
-        // 获取文章标题 - 支持不同类型文章页面的标题获取
-        let articleTitle;
+        // 获取文章标题
+        let articleTitle = document.title.replace(' - 先知社区', '');
         if (location.pathname.includes('/news/')) {
-            // news类型文章
             articleTitle = document.querySelector('.article-title')?.textContent?.trim() 
                 || document.querySelector('h1')?.textContent?.trim()
-                || document.title.replace(' - 先知社区', '');
+                || articleTitle;
         } else {
-            // 常规t类型文章
             articleTitle = document.querySelector('.detail-title')?.textContent?.trim() 
-                || document.title.replace(' - 先知社区', '');
+                || articleTitle;
         }
         
-        // 创建新的容器
-        const newContainer = document.createElement('div');
-        newContainer.id = 'xianzhi-center-wrapper';
-        newContainer.style.cssText = `
-            max-width: 800px !important;
-            margin: 0 auto !important;
-            padding: 20px !important;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
-            font-size: 16px !important;
-            line-height: 1.8 !important;
-            color: #333 !important;
-            background-color: white !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-        `;
-
-        // 创建标题
-        const titleElement = document.createElement('h1');
-        titleElement.textContent = articleTitle;
-        titleElement.style.cssText = `
-            font-size: 28px !important;
-            font-weight: 600 !important;
-            margin-bottom: 16px !important;
-            color: #000 !important;
-            text-align: center !important;
-            line-height: 1.4 !important;
-        `;
-        newContainer.appendChild(titleElement);
-
-        // 创建作者和发布时间元素
-        const authorContainer = document.createElement('div');
-        authorContainer.style.cssText = `
-            display: flex !important;
-            justify-content: center !important;
-            margin-bottom: 24px !important;
-            color: #666 !important;
-            font-size: 14px !important;
-            border-bottom: 1px solid #eee !important;
-            padding-bottom: 16px !important;
-        `;
+        // 按用户建议，直接删除干扰元素
+        const elementsToRemove = [
+            'div[style*="border-bottom: 1px solid #ededed"][style*="display: flex"][style*="position: fixed"]',
+            '.right_container',
+            '.detail_share',
+            '.detail_comment',
+            '.comment_box_quill',
+            '.footer',
+            '#header',
+            '.navbar',
+            '.nav',
+            '.related-articles',
+            '.article-tags',
+            '.actions',
+            '.recommend',
+            '.advertisement'
+        ];
         
-        // 获取作者和时间 - 支持不同类型文章页面的信息获取
-        let authorName = '佚名';
-        let publishTime = '';
+        elementsToRemove.forEach(selector => {
+            document.querySelectorAll(selector).forEach(element => {
+                if (element) element.remove();
+            });
+        });
         
-        if (location.pathname.includes('/news/')) {
-            // news类型文章
-            authorName = document.querySelector('.author a')?.textContent?.trim() 
-                || document.querySelector('.author')?.textContent?.trim()
-                || '佚名';
-            publishTime = document.querySelector('.time')?.textContent?.trim() 
-                || document.querySelector('.date')?.textContent?.trim() 
-                || '';
-        } else {
-            // 常规t类型文章
-            authorName = document.querySelector('.author-name')?.textContent?.trim() || '佚名';
-            publishTime = document.querySelector('.time')?.textContent?.trim() || '';
-        }
-        
-        authorContainer.innerHTML = `
-            <span style="margin-right: 16px !important;">作者：${authorName}</span>
-            <span>发布时间：${publishTime}</span>
-        `;
-        newContainer.appendChild(authorContainer);
-
-        // 克隆文章内容 - 支持不同类型文章页面的内容获取
-        const contentElement = location.pathname.includes('/news/') 
-            ? document.querySelector('.article-content') || document.querySelector('.content')
-            : document.querySelector('.detail-content');
-            
-        if (contentElement) {
-            const contentClone = contentElement.cloneNode(true);
+        // 调整主体内容样式
+        const mainContent = document.querySelector('.detail-content') || 
+                           document.querySelector('.article-content') || 
+                           document.querySelector('.content');
+                           
+        if (mainContent) {
+            mainContent.style.cssText = `
+                max-width: 800px !important;
+                margin: 0 auto !important;
+                padding: 20px !important;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+                font-size: 16px !important;
+                line-height: 1.8 !important;
+                color: #333 !important;
+            `;
             
             // 处理图片，确保图片正常显示
-            const images = contentClone.querySelectorAll('img');
+            const images = mainContent.querySelectorAll('img');
             images.forEach(img => {
-                // 确保图片来源可靠
                 if (img.src) {
                     img.style.cssText = `
                         max-width: 100% !important;
@@ -1739,7 +1704,7 @@
             });
 
             // 处理代码块，确保代码高亮和行号显示正常
-            const codeBlocks = contentClone.querySelectorAll('pre, code, .hljs');
+            const codeBlocks = mainContent.querySelectorAll('pre, code, .hljs');
             codeBlocks.forEach(block => {
                 block.style.cssText = `
                     background-color: #f6f8fa !important;
@@ -1758,9 +1723,9 @@
                     print-color-adjust: exact !important;
                 `;
             });
-
+            
             // 处理行号显示
-            const lineNumbers = contentClone.querySelectorAll('.gutter, .line-numbers');
+            const lineNumbers = mainContent.querySelectorAll('.gutter, .line-numbers');
             lineNumbers.forEach(lineNum => {
                 lineNum.style.cssText = `
                     background-color: #f6f8fa !important;
@@ -1775,81 +1740,11 @@
                     user-select: none !important;
                 `;
             });
-
-            // 处理链接，确保链接样式一致
-            const links = contentClone.querySelectorAll('a');
-            links.forEach(link => {
-                link.style.cssText = `
-                    color: #0366d6 !important;
-                    text-decoration: none !important;
-                `;
-            });
-
-            // 处理标题样式
-            const headings = contentClone.querySelectorAll('h1, h2, h3, h4, h5, h6');
-            headings.forEach(heading => {
-                heading.style.cssText = `
-                    margin-top: 24px !important;
-                    margin-bottom: 16px !important;
-                    font-weight: 600 !important;
-                    line-height: 1.25 !important;
-                    color: #000 !important;
-                `;
-            });
-
-            // 处理表格，确保表格正常显示
-            const tables = contentClone.querySelectorAll('table');
-            tables.forEach(table => {
-                table.style.cssText = `
-                    width: 100% !important;
-                    border-collapse: collapse !important;
-                    margin-bottom: 20px !important;
-                    overflow-x: auto !important;
-                    display: block !important;
-                `;
-
-                const ths = table.querySelectorAll('th');
-                ths.forEach(th => {
-                    th.style.cssText = `
-                        background-color: #f6f8fa !important;
-                        padding: 8px !important;
-                        border: 1px solid #ddd !important;
-                        font-weight: 600 !important;
-                        text-align: left !important;
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                    `;
-                });
-
-                const tds = table.querySelectorAll('td');
-                tds.forEach(td => {
-                    td.style.cssText = `
-                        padding: 8px !important;
-                        border: 1px solid #ddd !important;
-                    `;
-                });
-            });
-
-            newContainer.appendChild(contentClone);
         }
-
-        // 删除不必要元素 - 加入更多可能的干扰元素类名和ID
-        document.querySelectorAll('#header, .nav, .sidebar, #footer, .comment, .recommend, .advertisement, .author-info, .navbar, .related-articles, .article-tags, .actions').forEach(element => {
-            if (element) element.remove();
-        });
-
-        // 清空页面内容并添加新容器
-        document.body.innerHTML = '';
-        document.body.style.cssText = `
-            margin: 0 !important;
-            padding: 0 !important;
-            background-color: white !important;
-        `;
-        document.body.appendChild(newContainer);
-
+        
         // 添加版权信息
         const footer = document.createElement('div');
-        footer.textContent = '文章优化打印合集 v3.7.1 | 先知社区';
+        footer.textContent = '文章优化打印合集 v3.7.2 | 先知社区';
         footer.style.cssText = `
             text-align: center !important;
             font-size: 12px !important;
@@ -1857,10 +1752,13 @@
             padding: 16px 20px !important;
             margin-top: 32px !important;
             border-top: 1px solid #eee !important;
+            max-width: 800px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
         `;
-        newContainer.appendChild(footer);
-
-        // 动态添加打印样式
+        document.body.appendChild(footer);
+        
+        // 添加打印样式
         const printStyle = document.createElement('style');
         printStyle.textContent = `
             @media print {
@@ -1868,11 +1766,6 @@
                     margin: 0 !important;
                     padding: 0 !important;
                     background-color: white !important;
-                }
-                #xianzhi-center-wrapper {
-                    box-shadow: none !important;
-                    width: 100% !important;
-                    max-width: 100% !important;
                 }
                 @page {
                     margin: 1cm !important;
@@ -1894,7 +1787,7 @@
             }
         `;
         document.head.appendChild(printStyle);
-
+        
         // 处理打印或保存
         handlePrintOrSave(autoPrint, savePdf, articleTitle);
     }
