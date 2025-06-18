@@ -558,7 +558,6 @@
             '.extension-banner', // 扩展横幅
             '.author-info-block', // 作者信息
             '.recommend-box', // 推荐框
-            '.article-title-box + div', // 作者信息下方的分享等按钮
             '.article-title-box .stat-item', // 文章标题下的统计信息
             '.article-title-box .stat-view-times', // 阅读次数
             '.article-title-box .stat-like', // 点赞
@@ -1389,98 +1388,91 @@
             });
         });
         
-        // 调整主贴内容样式
-        const mainPostContent = document.querySelector('.message');
-        if (mainPostContent) {
-            mainPostContent.style.cssText = `
+        // 主要修改：处理div.left_content
+        const leftContent = document.querySelector('div.left_content');
+        if (leftContent) {
+            // 移除可能影响布局的样式
+            leftContent.style.cssText = `
                 width: 100% !important;
+                max-width: 800px !important;
+                margin: 0 auto !important;
+                float: none !important;
+                padding: 20px !important;
+                box-sizing: border-box !important;
+                display: block !important;
+            `;
+            
+            // 确保内容区域外的容器不限制宽度
+            const parentElements = [];
+            let currentEl = leftContent.parentElement;
+            while (currentEl && currentEl !== document.body) {
+                parentElements.push(currentEl);
+                currentEl = currentEl.parentElement;
+            }
+            
+            // 移除所有父容器的宽度限制
+            parentElements.forEach(el => {
+                el.style.cssText += `
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    margin: 0 auto !important;
+                    padding: 0 !important;
+                    float: none !important;
+                `;
+            });
+        }
+        
+        // 重新设置页面结构，强制居中
+        const contentArea = document.querySelector('.message') || document.querySelector('.t_fsz') || document.querySelector('.read_post');
+        if (contentArea && !document.getElementById('kanxue-center-wrapper')) {
+            // 创建居中包装器
+            const centerWrapper = document.createElement('div');
+            centerWrapper.id = 'kanxue-center-wrapper';
+            centerWrapper.style.cssText = `
                 max-width: 800px !important;
                 margin: 0 auto !important;
                 padding: 20px !important;
-                font-size: 16px !important;
-                line-height: 1.7 !important;
-                color: #333 !important;
-                box-sizing: border-box !important;
-            `;
-        }
-        
-        // 创建一个居中的容器包裹整个帖子内容
-        const postContent = document.querySelector('.t_fsz');
-        if (postContent) {
-            // 创建外层容器
-            const centerContainer = document.createElement('div');
-            centerContainer.style.cssText = `
-                width: 100% !important;
-                max-width: 850px !important;
-                margin: 0 auto !important;
-                padding: 0 20px !important;
+                background-color: white !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+                border-radius: 4px !important;
                 box-sizing: border-box !important;
             `;
             
-            // 将原内容移到居中容器中
-            const originalParent = postContent.parentNode;
-            originalParent.insertBefore(centerContainer, postContent);
-            centerContainer.appendChild(postContent);
-        }
-        
-        // 优化帖子标题
-        const titleElement = document.querySelector('.thread_subject');
-        if (titleElement) {
-            titleElement.style.cssText = `
-                font-size: 24px !important;
-                font-weight: bold !important;
-                text-align: center !important;
-                margin: 20px auto !important;
-                padding: 0 !important;
-                color: #333 !important;
-                max-width: 800px !important;
+            // 保存原始内容的父元素引用
+            const originalParent = contentArea.parentNode;
+            
+            // 将内容区域移动到新的居中包装器中
+            centerWrapper.appendChild(contentArea.cloneNode(true));
+            
+            // 清除原始页面内容
+            document.body.innerHTML = '';
+            
+            // 添加标题
+            if (articleTitle) {
+                const titleEl = document.createElement('h1');
+                titleEl.textContent = articleTitle;
+                titleEl.style.cssText = `
+                    font-size: 24px !important;
+                    font-weight: bold !important;
+                    text-align: center !important;
+                    margin: 20px auto !important;
+                    padding: 0 !important;
+                    color: #333 !important;
+                `;
+                centerWrapper.insertBefore(titleEl, centerWrapper.firstChild);
+            }
+            
+            // 将居中包装器添加到页面
+            document.body.appendChild(centerWrapper);
+            
+            // 设置页面基本样式
+            document.body.style.cssText = `
+                margin: 0 !important;
+                padding: 0 !important; 
+                background-color: #f6f6f6 !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif !important;
             `;
         }
-        
-        // 确保整个页面容器居中
-        const pageContainer = document.getElementById('wp');
-        if (pageContainer) {
-            pageContainer.style.cssText = `
-                width: 100% !important;
-                max-width: none !important;
-                margin: 0 auto !important;
-                padding: 0 !important;
-                background: #fff !important;
-            `;
-        }
-        
-        // 创建一个全局的样式，确保所有内容居中
-        const centerStyle = document.createElement('style');
-        centerStyle.textContent = `
-            body {
-                width: 100% !important;
-                margin: 0 auto !important;
-                padding: 0 !important;
-                background: #f6f6f6 !important;
-            }
-            #ct {
-                width: 100% !important;
-                max-width: 100% !important;
-                margin: 0 auto !important;
-                padding: 0 !important;
-                background: #fff !important;
-            }
-            .read_post {
-                width: 100% !important;
-                max-width: 900px !important;
-                margin: 0 auto !important;
-                background: #fff !important;
-                padding: 20px 0 !important;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.05) !important;
-                border-radius: 4px !important;
-            }
-            .plc {
-                width: 100% !important;
-                padding: 0 !important;
-                margin: 0 auto !important;
-            }
-        `;
-        document.head.appendChild(centerStyle);
         
         // 优化图片显示
         document.querySelectorAll('.message img').forEach(img => {
