@@ -1394,7 +1394,7 @@
         if (mainPostContent) {
             mainPostContent.style.cssText = `
                 width: 100% !important;
-                max-width: 100% !important;
+                max-width: 800px !important;
                 margin: 0 auto !important;
                 padding: 20px !important;
                 font-size: 16px !important;
@@ -1402,6 +1402,25 @@
                 color: #333 !important;
                 box-sizing: border-box !important;
             `;
+        }
+        
+        // 创建一个居中的容器包裹整个帖子内容
+        const postContent = document.querySelector('.t_fsz');
+        if (postContent) {
+            // 创建外层容器
+            const centerContainer = document.createElement('div');
+            centerContainer.style.cssText = `
+                width: 100% !important;
+                max-width: 850px !important;
+                margin: 0 auto !important;
+                padding: 0 20px !important;
+                box-sizing: border-box !important;
+            `;
+            
+            // 将原内容移到居中容器中
+            const originalParent = postContent.parentNode;
+            originalParent.insertBefore(centerContainer, postContent);
+            centerContainer.appendChild(postContent);
         }
         
         // 优化帖子标题
@@ -1414,8 +1433,54 @@
                 margin: 20px auto !important;
                 padding: 0 !important;
                 color: #333 !important;
+                max-width: 800px !important;
             `;
         }
+        
+        // 确保整个页面容器居中
+        const pageContainer = document.getElementById('wp');
+        if (pageContainer) {
+            pageContainer.style.cssText = `
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+                background: #fff !important;
+            `;
+        }
+        
+        // 创建一个全局的样式，确保所有内容居中
+        const centerStyle = document.createElement('style');
+        centerStyle.textContent = `
+            body {
+                width: 100% !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+                background: #f6f6f6 !important;
+            }
+            #ct {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+                background: #fff !important;
+            }
+            .read_post {
+                width: 100% !important;
+                max-width: 900px !important;
+                margin: 0 auto !important;
+                background: #fff !important;
+                padding: 20px 0 !important;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.05) !important;
+                border-radius: 4px !important;
+            }
+            .plc {
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 auto !important;
+            }
+        `;
+        document.head.appendChild(centerStyle);
         
         // 优化图片显示
         document.querySelectorAll('.message img').forEach(img => {
