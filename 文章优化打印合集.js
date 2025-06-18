@@ -1388,40 +1388,6 @@
             });
         });
         
-        // 主要修改：处理div.left_content
-        const leftContent = document.querySelector('div.left_content');
-        if (leftContent) {
-            // 移除可能影响布局的样式
-            leftContent.style.cssText = `
-                width: 100% !important;
-                max-width: 800px !important;
-                margin: 0 auto !important;
-                float: none !important;
-                padding: 20px !important;
-                box-sizing: border-box !important;
-                display: block !important;
-            `;
-            
-            // 确保内容区域外的容器不限制宽度
-            const parentElements = [];
-            let currentEl = leftContent.parentElement;
-            while (currentEl && currentEl !== document.body) {
-                parentElements.push(currentEl);
-                currentEl = currentEl.parentElement;
-            }
-            
-            // 移除所有父容器的宽度限制
-            parentElements.forEach(el => {
-                el.style.cssText += `
-                    width: 100% !important;
-                    max-width: 100% !important;
-                    margin: 0 auto !important;
-                    padding: 0 !important;
-                    float: none !important;
-                `;
-            });
-        }
-        
         // 重新设置页面结构，强制居中
         const contentArea = document.querySelector('.message') || document.querySelector('.t_fsz') || document.querySelector('.read_post');
         if (contentArea && !document.getElementById('kanxue-center-wrapper')) {
@@ -1472,6 +1438,54 @@
                 background-color: #f6f6f6 !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif !important;
             `;
+            
+            // 添加说明：保留原有样式
+            const stylePreserver = document.createElement('style');
+            stylePreserver.textContent = `
+                /* 保留所有原有样式 */
+                #kanxue-center-wrapper * {
+                    font-family: inherit;
+                }
+                
+                /* 保留代码块的原始样式 */
+                #kanxue-center-wrapper pre, 
+                #kanxue-center-wrapper code, 
+                #kanxue-center-wrapper .blockcode, 
+                #kanxue-center-wrapper .code,
+                #kanxue-center-wrapper .message pre,
+                #kanxue-center-wrapper .message code,
+                #kanxue-center-wrapper .t_fsz pre,
+                #kanxue-center-wrapper .t_fsz code {
+                    font-family: monospace !important;
+                    white-space: pre-wrap !important;
+                    word-wrap: break-word !important;
+                    overflow-x: auto !important;
+                }
+                
+                /* 保留文章内容的原始样式 */
+                #kanxue-center-wrapper .message,
+                #kanxue-center-wrapper .t_fsz {
+                    font: inherit !important;
+                }
+                
+                /* 确保图片正确显示 */
+                #kanxue-center-wrapper img {
+                    max-width: 100%;
+                    height: auto;
+                    margin: 10px 0;
+                }
+                
+                /* 恢复表格样式 */
+                #kanxue-center-wrapper table,
+                #kanxue-center-wrapper tr,
+                #kanxue-center-wrapper td,
+                #kanxue-center-wrapper th {
+                    border-collapse: inherit;
+                    border-spacing: inherit;
+                    border: inherit;
+                }
+            `;
+            document.head.appendChild(stylePreserver);
         }
         
         // 优化图片显示
