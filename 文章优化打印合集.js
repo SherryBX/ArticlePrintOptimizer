@@ -1,14 +1,15 @@
 // ==UserScript==
 // @name         文章优化打印合集
 // @namespace    http://tampermonkey.net/
-// @version      3.4
-// @description  优化CSDN、稀土掘金、知乎专栏、微信公众号和吾爱论坛文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
+// @version      3.5
+// @description  优化CSDN、稀土掘金、知乎专栏、微信公众号、看雪论坛和吾爱论坛文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
 // @author       Sherry
 // @match        *://*.csdn.net/*/article/details/*
 // @match        *://juejin.cn/post/*
 // @match        *://zhuanlan.zhihu.com/p/*
 // @match        *://www.52pojie.cn/thread-*-*-*.html
 // @match        *://mp.weixin.qq.com/s/*
+// @match        *://bbs.kanxue.com/thread-*.htm*
 // @grant        none
 // @run-at       document-end
 // @icon         https://tse1-mm.cn.bing.net/th/id/OIP-C.3iWufqIms_ccabhKcsM4GgHaHa?w=180&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7
@@ -26,6 +27,7 @@
     const isZhihu = location.hostname.includes('zhuanlan.zhihu.com');
     const is52pojie = location.hostname.includes('52pojie.cn') && location.pathname.includes('/thread-');
     const isWeixin = location.hostname.includes('mp.weixin.qq.com') && location.pathname.includes('/s/');
+    const isKanxue = location.hostname.includes('bbs.kanxue.com') && location.pathname.includes('/thread-');
     
     // 网站相关配置 - 统一使用蓝色主题
     const siteConfig = {
@@ -53,6 +55,11 @@
             name: '微信公众号',
             color: '#1890ff',
             icon: '📄'
+        },
+        kanxue: {
+            name: '看雪论坛',
+            color: '#1890ff',
+            icon: '📄'
         }
     };
     
@@ -68,6 +75,8 @@
         currentSite = siteConfig.pojie;
     } else if (isWeixin) {
         currentSite = siteConfig.weixin;
+    } else if (isKanxue) {
+        currentSite = siteConfig.kanxue;
     }
     
     // 创建控制面板
@@ -1293,6 +1302,220 @@
         handlePrintOrSave(autoPrint, savePdf, articleTitle);
     }
     
+    // 优化看雪论坛文章页面
+    function optimizeKanxuePage(autoPrint = false, savePdf = false) {
+        // 获取文章标题
+        const articleTitle = document.querySelector('.thread_subject')?.textContent?.trim() || document.title.replace(' - 看雪论坛', '');
+        
+        // 删除不必要元素
+        const elementsToRemove = [
+            '#header', // 顶部导航
+            '#headsidetool', // 头部工具栏
+            '#lsform', // 搜索表单
+            '.bdnav', // 面包屑导航
+            '.forum_nav', // 论坛导航
+            '#postList > div:not(:first-child)', // 移除所有回帖，只保留原帖
+            '#p_btn', // 帖子按钮
+            '.pob', // 帖子操作按钮
+            '.plc .pi', // 帖子信息
+            '.authi', // 作者信息
+            '.pls', // 左侧用户信息栏
+            '.rate', // 评分区域
+            '.sign', // 签名
+            '#p_btn', // 按钮区域
+            '.comment_inner', // 评论区
+            '#footer', // 页脚
+            '#post_extras', // 额外内容
+            '.ad_column', // 广告
+            '.mobile_topic_ad', // 移动话题广告
+            '#mn_forum_menu', // 论坛菜单
+            '.j_wft_hd_wrapper', // 头部包装
+            '#j_p_postlist > div:not(:first-child)', // 只保留原帖
+            '.p_reply', // 回复工具条
+            '#umenu', // 用户菜单
+            '#toptb', // 顶部工具条
+            '#wp > .wp.a_h', // 顶部隐藏区域
+            '#nv_forum + div', // 导航下方不必要的div
+            '.pgt', // 分页导航工具
+            '.pg', // 分页
+            '.bm.bml.pbn', // 帖子功能区
+            '#fastpostform', // 快速回复表单
+            '.banner-bg', // 横幅背景
+            '.post-head', // 帖子头部
+            '#post-comment', // 帖子评论区
+            '#post_comment', // 评论区
+            '#post_head', // 帖子头部
+            '.plc > .po', // 帖子下方操作区
+            '.post-attach', // 帖子附件
+            '.forum-tag-wrap', // 论坛标签包装
+            '.user-box', // 用户框
+            '.push-status', // 推送状态
+            '.btn-post-page', // 帖子页面按钮
+            '.userinfo', // 用户信息
+            '.post-tail-wrap', // 帖子尾部包装
+            '.thread_footer', // 帖子底部
+            '.postactions', // 帖子操作区域
+            '.message_author', // 帖子作者信息
+            '#chatroom-right-sidebar', // 聊天室右侧边栏
+            '.hot_recommend', // 热门推荐
+            '.kanxue_recom', // 看雪推荐
+            '.thread_tags', // 帖子标签
+            '.thread_share', // 帖子分享
+            '.post_comment', // 帖子评论
+            '.thread_option', // 帖子选项
+            '.bottom_banner', // 底部横幅
+            '.btn_reply', // 回复按钮
+            '.reply_msg', // 回复消息
+            '#sidebar', // 侧边栏
+            '.plc > div[id^="post_rate_div"]', // 评分div
+            '.info_bmc' // 附加信息
+        ];
+        
+        elementsToRemove.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                el.remove();
+            });
+        });
+        
+        // 调整主贴内容样式
+        const mainPostContent = document.querySelector('.message');
+        if (mainPostContent) {
+            mainPostContent.style.cssText = `
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
+                padding: 20px !important;
+                font-size: 16px !important;
+                line-height: 1.7 !important;
+                color: #333 !important;
+                box-sizing: border-box !important;
+            `;
+        }
+        
+        // 优化帖子标题
+        const titleElement = document.querySelector('.thread_subject');
+        if (titleElement) {
+            titleElement.style.cssText = `
+                font-size: 24px !important;
+                font-weight: bold !important;
+                text-align: center !important;
+                margin: 20px auto !important;
+                padding: 0 !important;
+                color: #333 !important;
+            `;
+        }
+        
+        // 优化图片显示
+        document.querySelectorAll('.message img').forEach(img => {
+            img.style.cssText = `
+                max-width: 90% !important;
+                height: auto !important;
+                margin: 15px auto !important;
+                display: block !important;
+                border: none !important;
+            `;
+            img.setAttribute('loading', 'eager'); // 确保图片加载
+        });
+        
+        // 处理代码块
+        document.querySelectorAll('pre, code, .blockcode, .code').forEach(codeBlock => {
+            codeBlock.style.cssText = `
+                max-width: 90% !important;
+                margin: 15px auto !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                background-color: #1e1e1e !important;
+                color: #d4d4d4 !important;
+                border: 1px solid #333 !important;
+                padding: 15px !important;
+                border-radius: 5px !important;
+                font-family: Consolas, Monaco, monospace !important;
+                overflow-x: auto !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            `;
+            
+            // 调整代码块内部所有文本颜色
+            const allElements = codeBlock.querySelectorAll('*');
+            allElements.forEach(el => {
+                el.style.color = '#d4d4d4';
+            });
+        });
+        
+        // 添加打印样式
+        const printStyle = document.createElement('style');
+        printStyle.id = 'kanxue-print-style';
+        printStyle.textContent = `
+            @media print {
+                body {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    font-size: 12pt !important;
+                    background: white !important;
+                }
+                
+                .message {
+                    font-size: 12pt !important;
+                    line-height: 1.6 !important;
+                }
+                
+                h1, h2, h3, h4, h5, h6 {
+                    page-break-after: avoid !important;
+                    page-break-inside: avoid !important;
+                }
+                
+                pre, code, .blockcode, .code {
+                    page-break-inside: avoid !important;
+                    white-space: pre-wrap !important;
+                    word-break: break-word !important;
+                    background-color: #1e1e1e !important;
+                    color: #d4d4d4 !important;
+                    -webkit-print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                
+                img {
+                    page-break-inside: avoid !important;
+                    max-width: 90% !important;
+                    height: auto !important;
+                    margin: 10px auto !important;
+                    display: block !important;
+                }
+                
+                a {
+                    text-decoration: underline !important;
+                    color: #000 !important;
+                }
+                
+                #article-print-panel {
+                    display: none !important;
+                }
+                
+                /* 添加页码 */
+                @page {
+                    margin: 1cm;
+                    @bottom-center {
+                        content: "第 " counter(page) " 页，共 " counter(pages) " 页";
+                    }
+                }
+                
+                /* 隐藏其他不必要元素 */
+                table, tr, td {
+                    border: none !important;
+                    background: none !important;
+                }
+            }
+        `;
+        document.head.appendChild(printStyle);
+        
+        // 显示成功消息
+        console.log('看雪论坛文章优化完成，准备打印或保存为PDF');
+        
+        handlePrintOrSave(autoPrint, savePdf, articleTitle);
+    }
+    
     // 处理打印或保存PDF
     function handlePrintOrSave(autoPrint = false, savePdf = false, articleTitle = '') {
         // 确保控制面板样式不受页面优化影响
@@ -1337,6 +1560,8 @@
             optimize52pojiePage(autoPrint, savePdf);
         } else if (isWeixin) {
             optimizeWeixinPage(autoPrint, savePdf);
+        } else if (isKanxue) {
+            optimizeKanxuePage(autoPrint, savePdf);
         }
     }
     
