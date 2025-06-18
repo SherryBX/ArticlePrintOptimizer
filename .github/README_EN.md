@@ -2,11 +2,11 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.2-blue)
+![Version](https://img.shields.io/badge/version-3.6-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Supported Sites](https://img.shields.io/badge/supports-CSDN%20%7C%20Juejin%20%7C%20Zhihu%20%7C%2052pojie-orange)
+![Supported Sites](https://img.shields.io/badge/supports-CSDN%20%7C%20Juejin%20%7C%20Zhihu%20%7C%20WeChat%20%7C%20Kanxue%20%7C%2052pojie-orange)
 
-**Optimize CSDN, Juejin, Zhihu, and 52pojie forum articles for a clean reading experience, one-click printing and PDF export**
+**Optimize CSDN, Juejin, Zhihu, WeChat official accounts, Kanxue forum and 52pojie forum articles for a clean reading experience, one-click printing and PDF export**
 
 [简体中文](../README.md) | English
 
@@ -28,6 +28,8 @@
 | **CSDN** | ✅ |
 | **Juejin** | ✅ |
 | **Zhihu** | ✅ |
+| **WeChat Official Accounts** | ✅ |
+| **Kanxue Forum** | ✅ |
 | **52pojie Forum** | ✅ |
 
 ## 🚀 Installation
@@ -68,6 +70,21 @@ The script automatically removes the following elements:
 - Adds page numbers (when printing)
 
 ## 📝 Changelog
+
+### v3.6
+- 🛠️ Fixed code block display issues in Kanxue forum
+- ⚙️ Improved line numbers display in code blocks
+- 🎨 Preserved original syntax highlighting colors in code blocks
+
+### v3.5
+- 🆕 Added support for Kanxue forum
+- 💻 Optimized code blocks display for printing
+- 🌐 Support for Kanxue forum technical articles
+
+### v3.4
+- 🆕 Added support for WeChat official accounts
+- 🖼️ Improved image display in WeChat articles
+- 🎨 Enhanced overall layout for WeChat articles
 
 ### v3.2
 - 🆕 Added support for 52pojie Forum

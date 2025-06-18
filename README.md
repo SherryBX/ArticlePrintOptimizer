@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![版本](https://img.shields.io/badge/版本-3.5-blue)
+![版本](https://img.shields.io/badge/版本-3.6-blue)
 ![License](https://img.shields.io/badge/许可证-MIT-green)
 ![支持网站](https://img.shields.io/badge/支持网站-CSDN%20%7C%20掘金%20%7C%20知乎%20%7C%20微信%20%7C%20看雪%20%7C%20吾爱-orange)
 
@@ -77,10 +77,15 @@
 
 ## 📝 更新日志
 
+### v3.6
+- 🛠️ 修复看雪论坛代码框显示问题
+- ⚙️ 优化代码块行号显示样式
+- 🎨 保留代码块原有的高亮颜色方案
+
 ### v3.5
 - 🆕 新增看雪论坛文章支持
 - 💻 优化代码块在打印时的显示效果
-- 🌐 支持看雪论坛技术文章的阅读和打印
+- �� 支持看雪论坛技术文章的阅读和打印
 
 ### v3.4
 - 🆕 新增微信公众号文章支持

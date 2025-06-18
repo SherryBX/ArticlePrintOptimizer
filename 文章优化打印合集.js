@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         文章优化打印合集
 // @namespace    http://tampermonkey.net/
-// @version      3.5
+// @version      3.6
 // @description  优化CSDN、稀土掘金、知乎专栏、微信公众号、看雪论坛和吾爱论坛文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
 // @author       Sherry
 // @match        *://*.csdn.net/*/article/details/*
@@ -350,7 +350,7 @@
         
         // 添加版权信息
         const footer = document.createElement('div');
-        footer.textContent = '文章优化打印合集 v3.0';
+        footer.textContent = '文章优化打印合集 v3.6';
         footer.style.cssText = `
             text-align: center !important;
             font-size: 12px !important;
@@ -1445,9 +1445,6 @@
                 // 应用黑色背景到语法高亮器容器
                 block.style.backgroundColor = '#1e1e1e';
                 
-                // 不设置整体文本颜色，让内部元素保持原有颜色
-                // block.style.color = '#d4d4d4'; -- 删除这行，保持原始颜色
-                
                 // 确保代码块其他样式适合阅读
                 block.style.padding = block.style.padding || '10px';
                 block.style.margin = block.style.margin || '10px 0';
@@ -1467,9 +1464,6 @@
                         // 保留语法高亮的原始颜色
                         el.style.webkitPrintColorAdjust = 'exact';
                         el.style.printColorAdjust = 'exact';
-                        
-                        // 不要修改颜色
-                        // el.style.color = ...; -- 不设置颜色，保持原始配色
                     }
                 });
             });
@@ -1485,8 +1479,6 @@
                 /* 处理代码块样式 - 只对syntaxhighlighter应用黑色背景但保持内部代码原始颜色 */
                 #kanxue-center-wrapper table.syntaxhighlighter {
                     background-color: #1e1e1e !important;
-                    /* 不设置整体颜色，保留原始代码配色 */
-                    /* color: #d4d4d4 !important; */
                     font-family: Consolas, Monaco, monospace !important;
                     white-space: pre-wrap !important;
                     word-wrap: break-word !important;
@@ -1501,9 +1493,36 @@
                 
                 /* 保持代码元素的原始颜色 */
                 #kanxue-center-wrapper table.syntaxhighlighter * {
-                    /* 不强制颜色，保持原始语法高亮 */
                     -webkit-print-color-adjust: exact !important;
                     print-color-adjust: exact !important;
+                }
+                
+                /* 修复代码行号显示 */
+                #kanxue-center-wrapper table.syntaxhighlighter .gutter {
+                    background-color: #333333 !important;
+                    border-right: 1px solid #4b4b4b !important;
+                    color: #9b9b9b !important;
+                    padding: 0 10px !important;
+                    min-width: 30px !important;
+                    text-align: right !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                    display: table-cell !important;
+                    vertical-align: top !important;
+                }
+                
+                /* 代码行内容 */
+                #kanxue-center-wrapper table.syntaxhighlighter .code {
+                    padding-left: 10px !important;
+                    vertical-align: top !important;
+                    display: table-cell !important;
+                }
+                
+                /* 代码行样式 */
+                #kanxue-center-wrapper table.syntaxhighlighter .line {
+                    white-space: pre !important;
+                    height: auto !important;
+                    line-height: 1.5 !important;
                 }
                 
                 /* 确保图片正确显示 */
@@ -1527,11 +1546,67 @@
                     }
                     #kanxue-center-wrapper table.syntaxhighlighter {
                         background-color: #1e1e1e !important;
-                        /* 不设置整体颜色，保留原始代码配色 */
-                        /* color: #d4d4d4 !important; */
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
                     }
+                    /* 确保行号在打印时也显示 */
+                    #kanxue-center-wrapper table.syntaxhighlighter .gutter {
+                        display: table-cell !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                }
+                
+                /* 保留pre元素中的代码样式 */
+                #kanxue-center-wrapper pre {
+                    background-color: #1e1e1e !important;
+                    border: 1px solid #333 !important;
+                    padding: 15px !important;
+                    border-radius: 5px !important;
+                    margin: 15px 0 !important;
+                    overflow-x: auto !important;
+                    white-space: pre-wrap !important;
+                    word-wrap: break-word !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                
+                /* 行号和代码颜色设置 */
+                #kanxue-center-wrapper .hljs {
+                    display: block !important;
+                    background: #1e1e1e !important;
+                    padding: 0.5em !important;
+                    color: #dcdcdc !important;
+                    overflow-x: auto !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                
+                /* 代码行号显示样式 */
+                #kanxue-center-wrapper .hljs-ln {
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                }
+                
+                #kanxue-center-wrapper .hljs-ln td {
+                    padding: 0 !important;
+                    vertical-align: top !important;
+                }
+                
+                #kanxue-center-wrapper .hljs-ln-numbers {
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                    text-align: right !important;
+                    color: #9b9b9b !important;
+                    border-right: 1px solid #4b4b4b !important;
+                    vertical-align: top !important;
+                    padding-right: 8px !important;
+                    min-width: 30px !important;
+                    display: table-cell !important;
+                }
+                
+                #kanxue-center-wrapper .hljs-ln-code {
+                    padding-left: 8px !important;
                 }
             `;
             document.head.appendChild(stylePreserver);
