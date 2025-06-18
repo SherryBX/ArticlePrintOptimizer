@@ -1368,7 +1368,18 @@
             '.reply_msg', // 回复消息
             '#sidebar', // 侧边栏
             '.plc > div[id^="post_rate_div"]', // 评分div
-            '.info_bmc' // 附加信息
+            '.info_bmc', // 附加信息
+            'header#header', // 页面头部
+            'ol.breadcrumb.mb-3.py-0.small.px-0', // 面包屑导航
+            'div.position-fixed.text-center.collection_thumb_left', // 左侧固定元素
+            'div.col-lg-3.pr-0.hidden-sm.hidden-md', // 右侧边栏
+            'div.card-body.thumb_list_body', // 缩略图列表
+            'div.card.px-2.px-md-5.py-5', // 卡片容器
+            'div.card.p-1', // 小卡片
+            'nav.text-right', // 右侧导航
+            'div.container.px-0.pb-3.bbs_footer_start_column', // 页脚开始列
+            'footer#footer', // 页脚
+            'a.btn.btn-secondary.btn-block.xn-back.my-3.mx-auto' // 返回按钮
         ];
         
         elementsToRemove.forEach(selector => {
