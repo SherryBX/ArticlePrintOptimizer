@@ -1439,12 +1439,14 @@
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif !important;
             `;
             
-            // 处理代码块，确保黑色背景
+            // 处理代码块，确保黑色背景但保留内部代码的原始颜色
             const codeBlocks = document.querySelectorAll('#kanxue-center-wrapper table.syntaxhighlighter');
             codeBlocks.forEach(block => {
-                // 应用黑色背景到语法高亮器
+                // 应用黑色背景到语法高亮器容器
                 block.style.backgroundColor = '#1e1e1e';
-                block.style.color = '#d4d4d4';
+                
+                // 不设置整体文本颜色，让内部元素保持原有颜色
+                // block.style.color = '#d4d4d4'; -- 删除这行，保持原始颜色
                 
                 // 确保代码块其他样式适合阅读
                 block.style.padding = block.style.padding || '10px';
@@ -1454,7 +1456,7 @@
                 block.style.wordWrap = 'break-word';
                 block.style.overflowX = 'auto';
                 
-                // 设置打印时保留背景色
+                // 设置打印时保留背景色和原始文字颜色
                 block.style.webkitPrintColorAdjust = 'exact';
                 block.style.printColorAdjust = 'exact';
                 
@@ -1465,6 +1467,9 @@
                         // 保留语法高亮的原始颜色
                         el.style.webkitPrintColorAdjust = 'exact';
                         el.style.printColorAdjust = 'exact';
+                        
+                        // 不要修改颜色
+                        // el.style.color = ...; -- 不设置颜色，保持原始配色
                     }
                 });
             });
@@ -1477,10 +1482,11 @@
                     font-family: inherit;
                 }
                 
-                /* 处理代码块样式 - 只对syntaxhighlighter应用黑色背景 */
+                /* 处理代码块样式 - 只对syntaxhighlighter应用黑色背景但保持内部代码原始颜色 */
                 #kanxue-center-wrapper table.syntaxhighlighter {
                     background-color: #1e1e1e !important;
-                    color: #d4d4d4 !important;
+                    /* 不设置整体颜色，保留原始代码配色 */
+                    /* color: #d4d4d4 !important; */
                     font-family: Consolas, Monaco, monospace !important;
                     white-space: pre-wrap !important;
                     word-wrap: break-word !important;
@@ -1493,6 +1499,13 @@
                     width: 100% !important;
                 }
                 
+                /* 保持代码元素的原始颜色 */
+                #kanxue-center-wrapper table.syntaxhighlighter * {
+                    /* 不强制颜色，保持原始语法高亮 */
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                
                 /* 确保图片正确显示 */
                 #kanxue-center-wrapper img {
                     max-width: 100%;
@@ -1500,7 +1513,7 @@
                     margin: 10px 0;
                 }
                 
-                /* 打印样式，确保代码保持黑色背景 */
+                /* 打印样式，确保代码保持黑色背景且保留原始代码配色 */
                 @media print {
                     body {
                         background-color: white !important;
@@ -1514,7 +1527,8 @@
                     }
                     #kanxue-center-wrapper table.syntaxhighlighter {
                         background-color: #1e1e1e !important;
-                        color: #d4d4d4 !important;
+                        /* 不设置整体颜色，保留原始代码配色 */
+                        /* color: #d4d4d4 !important; */
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
                     }
