@@ -1303,8 +1303,12 @@
     
     // 优化看雪论坛文章页面
     function optimizeKanxuePage(autoPrint = false, savePdf = false) {
+        // 添加调试信息
+        console.log('[看雪优化] 开始优化页面，打印参数:', autoPrint, '保存PDF参数:', savePdf);
+        
         // 获取文章标题
         const articleTitle = document.querySelector('.thread_subject')?.textContent?.trim() || document.title.replace(' - 看雪论坛', '');
+        console.log('[看雪优化] 获取到标题:', articleTitle);
         
         // 删除不必要元素
         const elementsToRemove = [
@@ -1387,10 +1391,14 @@
                 el.remove();
             });
         });
-        
+        console.log('[看雪优化] 已移除干扰元素');
+
         // 重新设置页面结构，强制居中
         const contentArea = document.querySelector('.message') || document.querySelector('.t_fsz') || document.querySelector('.read_post');
+        console.log('[看雪优化] 找到内容区域:', contentArea ? '是' : '否');
+        
         if (contentArea && !document.getElementById('kanxue-center-wrapper')) {
+            console.log('[看雪优化] 创建居中包装器');
             // 创建居中包装器
             const centerWrapper = document.createElement('div');
             centerWrapper.id = 'kanxue-center-wrapper';
@@ -1409,6 +1417,7 @@
             
             // 将内容区域移动到新的居中包装器中
             centerWrapper.appendChild(contentArea.cloneNode(true));
+            console.log('[看雪优化] 内容已克隆到居中包装器');
             
             // 清除原始页面内容
             document.body.innerHTML = '';
@@ -1426,10 +1435,12 @@
                     color: #333 !important;
                 `;
                 centerWrapper.insertBefore(titleEl, centerWrapper.firstChild);
+                console.log('[看雪优化] 已添加标题');
             }
             
             // 将居中包装器添加到页面
             document.body.appendChild(centerWrapper);
+            console.log('[看雪优化] 居中包装器已添加到页面');
             
             // 设置页面基本样式
             document.body.style.cssText = `
@@ -1484,99 +1495,48 @@
                     border-spacing: inherit;
                     border: inherit;
                 }
-            `;
-            document.head.appendChild(stylePreserver);
-        }
-        
-        // 优化图片显示
-        document.querySelectorAll('.message img').forEach(img => {
-            img.style.cssText = `
-                max-width: 90% !important;
-                height: auto !important;
-                margin: 15px auto !important;
-                display: block !important;
-                border: none !important;
-            `;
-            img.setAttribute('loading', 'eager'); // 确保图片加载
-        });
-        
-        // 处理代码块
-        document.querySelectorAll('pre, code, .blockcode, .code').forEach(codeBlock => {
-            codeBlock.style.cssText = `
-                max-width: 90% !important;
-                margin: 15px auto !important;
-                white-space: pre-wrap !important;
-                word-wrap: break-word !important;
-                overflow-x: auto !important;
-            `;
-        });
-        
-        // 添加打印样式
-        const printStyle = document.createElement('style');
-        printStyle.id = 'kanxue-print-style';
-        printStyle.textContent = `
-            @media print {
-                body {
-                    margin: 0 !important;
-                    padding: 0 !important;
-                    font-size: 12pt !important;
-                    background: white !important;
-                }
                 
-                .message {
-                    font-size: 12pt !important;
-                    line-height: 1.6 !important;
-                }
-                
-                h1, h2, h3, h4, h5, h6 {
-                    page-break-after: avoid !important;
-                    page-break-inside: avoid !important;
-                }
-                
-                pre, code, .blockcode, .code {
-                    page-break-inside: avoid !important;
-                    white-space: pre-wrap !important;
-                    word-break: break-word !important;
-                }
-                
-                img {
-                    page-break-inside: avoid !important;
-                    max-width: 90% !important;
-                    height: auto !important;
-                    margin: 10px auto !important;
-                    display: block !important;
-                }
-                
-                a {
-                    text-decoration: underline !important;
-                    color: #000 !important;
-                }
-                
-                #article-print-panel {
-                    display: none !important;
-                }
-                
-                /* 添加页码 */
-                @page {
-                    margin: 1cm;
-                    @bottom-center {
-                        content: "第 " counter(page) " 页，共 " counter(pages) " 页";
+                /* 打印样式 */
+                @media print {
+                    body {
+                        background-color: white !important;
+                    }
+                    #kanxue-center-wrapper {
+                        box-shadow: none !important;
+                        max-width: 100% !important;
+                    }
+                    #article-print-panel {
+                        display: none !important;
                     }
                 }
-                
-                /* 隐藏其他不必要元素 */
-                table, tr, td {
-                    border: none !important;
-                    background: none !important;
+            `;
+            document.head.appendChild(stylePreserver);
+            console.log('[看雪优化] 样式保护已应用');
+            
+            // 重新创建控制面板
+            createControlPanel();
+            console.log('[看雪优化] 已重建控制面板');
+            
+            // 延迟执行打印或保存操作，确保页面渲染完成
+            console.log('[看雪优化] 准备执行打印操作，参数:', autoPrint, savePdf);
+            setTimeout(() => {
+                if (autoPrint) {
+                    console.log('[看雪优化] 执行打印');
+                    window.print();
+                } else if (savePdf) {
+                    console.log('[看雪优化] 执行保存PDF');
+                    window.print(); // 用户需在打印对话框中选择"另存为PDF"
                 }
+            }, 800);
+        } else {
+            // 如果没有重构页面，直接执行打印
+            console.log('[看雪优化] 没有重构页面，直接执行打印');
+            if (autoPrint) {
+                window.print();
+            } else if (savePdf) {
+                window.print(); // 用户需在打印对话框中选择"另存为PDF"
             }
-        `;
-        document.head.appendChild(printStyle);
-        
-        // 显示成功消息
-        console.log('看雪论坛文章优化完成，准备打印或保存为PDF');
-        
-        handlePrintOrSave(autoPrint, savePdf, articleTitle);
+        }
     }
     
     // 处理打印或保存PDF
@@ -1606,6 +1566,13 @@
                     setTimeout(function() {
                         panel.style.display = 'block';
                     }, 1000);
+                }, 500);
+            }
+        } else {
+            // 如果面板不存在，直接打印
+            if (autoPrint || savePdf) {
+                setTimeout(function() {
+                    window.print();
                 }, 500);
             }
         }
