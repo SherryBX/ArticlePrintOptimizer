@@ -1440,15 +1440,11 @@
             `;
             
             // 处理代码块，确保黑色背景
-            const codeBlocks = document.querySelectorAll('#kanxue-center-wrapper pre, #kanxue-center-wrapper code, #kanxue-center-wrapper .blockcode, #kanxue-center-wrapper .code');
+            const codeBlocks = document.querySelectorAll('#kanxue-center-wrapper table.syntaxhighlighter');
             codeBlocks.forEach(block => {
-                // 如果代码块没有明显的背景色，则应用黑色背景
-                const computedStyle = getComputedStyle(block);
-                const currentBg = computedStyle.backgroundColor;
-                if (currentBg === 'transparent' || currentBg === 'rgba(0, 0, 0, 0)' || currentBg === '') {
-                    block.style.backgroundColor = '#1e1e1e';
-                    block.style.color = '#d4d4d4';
-                }
+                // 应用黑色背景到语法高亮器
+                block.style.backgroundColor = '#1e1e1e';
+                block.style.color = '#d4d4d4';
                 
                 // 确保代码块其他样式适合阅读
                 block.style.padding = block.style.padding || '10px';
@@ -1461,6 +1457,16 @@
                 // 设置打印时保留背景色
                 block.style.webkitPrintColorAdjust = 'exact';
                 block.style.printColorAdjust = 'exact';
+                
+                // 确保内部元素也保持正确的颜色
+                const codeElements = block.querySelectorAll('*');
+                codeElements.forEach(el => {
+                    if(el.tagName === 'SPAN' || el.tagName === 'CODE') {
+                        // 保留语法高亮的原始颜色
+                        el.style.webkitPrintColorAdjust = 'exact';
+                        el.style.printColorAdjust = 'exact';
+                    }
+                });
             });
             
             // 添加说明：保留原有样式
@@ -1471,11 +1477,8 @@
                     font-family: inherit;
                 }
                 
-                /* 处理代码块样式 - 保证黑色背景 */
-                #kanxue-center-wrapper pre, 
-                #kanxue-center-wrapper code, 
-                #kanxue-center-wrapper .blockcode, 
-                #kanxue-center-wrapper .code {
+                /* 处理代码块样式 - 只对syntaxhighlighter应用黑色背景 */
+                #kanxue-center-wrapper table.syntaxhighlighter {
                     background-color: #1e1e1e !important;
                     color: #d4d4d4 !important;
                     font-family: Consolas, Monaco, monospace !important;
@@ -1486,14 +1489,8 @@
                     border-radius: 3px !important;
                     -webkit-print-color-adjust: exact !important;
                     print-color-adjust: exact !important;
-                }
-                
-                /* 处理代码块内容 */
-                #kanxue-center-wrapper pre *, 
-                #kanxue-center-wrapper code *, 
-                #kanxue-center-wrapper .blockcode *, 
-                #kanxue-center-wrapper .code * {
-                    color: #d4d4d4 !important;
+                    border-collapse: collapse !important;
+                    width: 100% !important;
                 }
                 
                 /* 确保图片正确显示 */
@@ -1515,10 +1512,7 @@
                     #article-print-panel {
                         display: none !important;
                     }
-                    #kanxue-center-wrapper pre, 
-                    #kanxue-center-wrapper code, 
-                    #kanxue-center-wrapper .blockcode, 
-                    #kanxue-center-wrapper .code {
+                    #kanxue-center-wrapper table.syntaxhighlighter {
                         background-color: #1e1e1e !important;
                         color: #d4d4d4 !important;
                         -webkit-print-color-adjust: exact !important;
