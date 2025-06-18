@@ -1303,12 +1303,8 @@
     
     // 优化看雪论坛文章页面
     function optimizeKanxuePage(autoPrint = false, savePdf = false) {
-        // 添加调试信息
-        console.log('[看雪优化] 开始优化页面，打印参数:', autoPrint, '保存PDF参数:', savePdf);
-        
         // 获取文章标题
         const articleTitle = document.querySelector('.thread_subject')?.textContent?.trim() || document.title.replace(' - 看雪论坛', '');
-        console.log('[看雪优化] 获取到标题:', articleTitle);
         
         // 删除不必要元素
         const elementsToRemove = [
@@ -1391,14 +1387,10 @@
                 el.remove();
             });
         });
-        console.log('[看雪优化] 已移除干扰元素');
 
         // 重新设置页面结构，强制居中
         const contentArea = document.querySelector('.message') || document.querySelector('.t_fsz') || document.querySelector('.read_post');
-        console.log('[看雪优化] 找到内容区域:', contentArea ? '是' : '否');
-        
         if (contentArea && !document.getElementById('kanxue-center-wrapper')) {
-            console.log('[看雪优化] 创建居中包装器');
             // 创建居中包装器
             const centerWrapper = document.createElement('div');
             centerWrapper.id = 'kanxue-center-wrapper';
@@ -1417,7 +1409,6 @@
             
             // 将内容区域移动到新的居中包装器中
             centerWrapper.appendChild(contentArea.cloneNode(true));
-            console.log('[看雪优化] 内容已克隆到居中包装器');
             
             // 清除原始页面内容
             document.body.innerHTML = '';
@@ -1435,12 +1426,10 @@
                     color: #333 !important;
                 `;
                 centerWrapper.insertBefore(titleEl, centerWrapper.firstChild);
-                console.log('[看雪优化] 已添加标题');
             }
             
             // 将居中包装器添加到页面
             document.body.appendChild(centerWrapper);
-            console.log('[看雪优化] 居中包装器已添加到页面');
             
             // 设置页面基本样式
             document.body.style.cssText = `
@@ -1450,33 +1439,61 @@
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif !important;
             `;
             
+            // 处理代码块，确保黑色背景
+            const codeBlocks = document.querySelectorAll('#kanxue-center-wrapper pre, #kanxue-center-wrapper code, #kanxue-center-wrapper .blockcode, #kanxue-center-wrapper .code');
+            codeBlocks.forEach(block => {
+                // 如果代码块没有明显的背景色，则应用黑色背景
+                const computedStyle = getComputedStyle(block);
+                const currentBg = computedStyle.backgroundColor;
+                if (currentBg === 'transparent' || currentBg === 'rgba(0, 0, 0, 0)' || currentBg === '') {
+                    block.style.backgroundColor = '#1e1e1e';
+                    block.style.color = '#d4d4d4';
+                }
+                
+                // 确保代码块其他样式适合阅读
+                block.style.padding = block.style.padding || '10px';
+                block.style.margin = block.style.margin || '10px 0';
+                block.style.borderRadius = '3px';
+                block.style.whiteSpace = 'pre-wrap';
+                block.style.wordWrap = 'break-word';
+                block.style.overflowX = 'auto';
+                
+                // 设置打印时保留背景色
+                block.style.webkitPrintColorAdjust = 'exact';
+                block.style.printColorAdjust = 'exact';
+            });
+            
             // 添加说明：保留原有样式
             const stylePreserver = document.createElement('style');
             stylePreserver.textContent = `
-                /* 保留所有原有样式 */
-                #kanxue-center-wrapper * {
+                /* 基本样式 */
+                #kanxue-center-wrapper {
                     font-family: inherit;
                 }
                 
-                /* 保留代码块的原始样式 */
+                /* 处理代码块样式 - 保证黑色背景 */
                 #kanxue-center-wrapper pre, 
                 #kanxue-center-wrapper code, 
                 #kanxue-center-wrapper .blockcode, 
-                #kanxue-center-wrapper .code,
-                #kanxue-center-wrapper .message pre,
-                #kanxue-center-wrapper .message code,
-                #kanxue-center-wrapper .t_fsz pre,
-                #kanxue-center-wrapper .t_fsz code {
-                    font-family: monospace !important;
+                #kanxue-center-wrapper .code {
+                    background-color: #1e1e1e !important;
+                    color: #d4d4d4 !important;
+                    font-family: Consolas, Monaco, monospace !important;
                     white-space: pre-wrap !important;
                     word-wrap: break-word !important;
                     overflow-x: auto !important;
+                    padding: 10px !important;
+                    border-radius: 3px !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
                 }
                 
-                /* 保留文章内容的原始样式 */
-                #kanxue-center-wrapper .message,
-                #kanxue-center-wrapper .t_fsz {
-                    font: inherit !important;
+                /* 处理代码块内容 */
+                #kanxue-center-wrapper pre *, 
+                #kanxue-center-wrapper code *, 
+                #kanxue-center-wrapper .blockcode *, 
+                #kanxue-center-wrapper .code * {
+                    color: #d4d4d4 !important;
                 }
                 
                 /* 确保图片正确显示 */
@@ -1486,17 +1503,7 @@
                     margin: 10px 0;
                 }
                 
-                /* 恢复表格样式 */
-                #kanxue-center-wrapper table,
-                #kanxue-center-wrapper tr,
-                #kanxue-center-wrapper td,
-                #kanxue-center-wrapper th {
-                    border-collapse: inherit;
-                    border-spacing: inherit;
-                    border: inherit;
-                }
-                
-                /* 打印样式 */
+                /* 打印样式，确保代码保持黑色背景 */
                 @media print {
                     body {
                         background-color: white !important;
@@ -1508,34 +1515,33 @@
                     #article-print-panel {
                         display: none !important;
                     }
+                    #kanxue-center-wrapper pre, 
+                    #kanxue-center-wrapper code, 
+                    #kanxue-center-wrapper .blockcode, 
+                    #kanxue-center-wrapper .code {
+                        background-color: #1e1e1e !important;
+                        color: #d4d4d4 !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
                 }
             `;
             document.head.appendChild(stylePreserver);
-            console.log('[看雪优化] 样式保护已应用');
             
             // 重新创建控制面板
             createControlPanel();
-            console.log('[看雪优化] 已重建控制面板');
             
-            // 延迟执行打印或保存操作，确保页面渲染完成
-            console.log('[看雪优化] 准备执行打印操作，参数:', autoPrint, savePdf);
+            // 直接执行打印或保存操作
             setTimeout(() => {
                 if (autoPrint) {
-                    console.log('[看雪优化] 执行打印');
                     window.print();
                 } else if (savePdf) {
-                    console.log('[看雪优化] 执行保存PDF');
                     window.print(); // 用户需在打印对话框中选择"另存为PDF"
                 }
             }, 800);
         } else {
             // 如果没有重构页面，直接执行打印
-            console.log('[看雪优化] 没有重构页面，直接执行打印');
-            if (autoPrint) {
-                window.print();
-            } else if (savePdf) {
-                window.print(); // 用户需在打印对话框中选择"另存为PDF"
-            }
+            handlePrintOrSave(autoPrint, savePdf, articleTitle);
         }
     }
     
