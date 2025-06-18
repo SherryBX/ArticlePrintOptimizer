@@ -2,11 +2,11 @@
 
 <div align="center">
 
-![版本](https://img.shields.io/badge/版本-3.2-blue)
+![版本](https://img.shields.io/badge/版本-3.4-blue)
 ![License](https://img.shields.io/badge/许可证-MIT-green)
-![支持网站](https://img.shields.io/badge/支持网站-CSDN%20%7C%20掘金%20%7C%20知乎%20%7C%20吾爱-orange)
+![支持网站](https://img.shields.io/badge/支持网站-CSDN%20%7C%20掘金%20%7C%20知乎%20%7C%20微信%20%7C%20吾爱-orange)
 
-**优化CSDN、稀土掘金、知乎专栏和吾爱论坛文章页面，提供清爽阅读体验，一键优化打印与PDF导出**
+**优化CSDN、稀土掘金、知乎专栏、微信公众号和吾爱论坛文章页面，提供清爽阅读体验，一键优化打印与PDF导出**
 
 简体中文 | [English](./.github/README_EN.md)
 
@@ -34,6 +34,7 @@
 | **CSDN** | ✅ |
 | **稀土掘金** | ✅ |
 | **知乎专栏** | ✅ |
+| **微信公众号** | ✅ |
 | **吾爱破解论坛** | ✅ |
 
 ## 🚀 安装方法
@@ -44,7 +45,7 @@
 
 ## 💡 使用方法
 
-1. 安装脚本后访问 [CSDN](https://blog.csdn.net/)、[稀土掘金](https://juejin.cn/)、[知乎专栏](https://zhuanlan.zhihu.com/) 或 [吾爱破解论坛](https://www.52pojie.cn/) 的文章页面
+1. 安装脚本后访问 [CSDN](https://blog.csdn.net/)、[稀土掘金](https://juejin.cn/)、[知乎专栏](https://zhuanlan.zhihu.com/)、[微信公众号](https://mp.weixin.qq.com/) 或 [吾爱破解论坛](https://www.52pojie.cn/) 的文章页面
 2. 页面右上角会出现悬浮控制面板
 3. 选择需要的功能：
 
@@ -74,6 +75,11 @@
 - 添加页码（打印时）
 
 ## 📝 更新日志
+
+### v3.4
+- 🆕 新增微信公众号文章支持
+- 🖼️ 优化微信文章中图片的显示效果
+- 🎨 改进微信公众号文章的整体布局
 
 ### v3.2
 - 🆕 新增吾爱破解论坛支持
