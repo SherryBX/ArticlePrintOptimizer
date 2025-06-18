@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.7-blue)
+![Version](https://img.shields.io/badge/version-3.7.2-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Supported Sites](https://img.shields.io/badge/supports-CSDN%20%7C%20Juejin%20%7C%20Zhihu%20%7C%20WeChat%20%7C%20Kanxue%20%7C%2052pojie%20%7C%20Xianzhi-orange)
 
@@ -70,7 +70,12 @@ The script automatically removes the following elements:
 - Ensures images display properly when printing
 - Adds page numbers (when printing)
 
-## �� Changelog
+## 📝 Changelog
+
+### v3.7.2
+- 🔄 Optimized floating panel display ratio and fixed icon display issues
+- ⚙️ Increased button and icon sizes for better user experience
+- 🖥️ Improved table and image display in Xianzhi community articles
 
 ### v3.7
 - 🆕 Added support for Aliyun Xianzhi community articles

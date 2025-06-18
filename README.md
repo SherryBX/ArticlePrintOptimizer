@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![版本](https://img.shields.io/badge/版本-3.7-blue)
+![版本](https://img.shields.io/badge/版本-3.7.2-blue)
 ![License](https://img.shields.io/badge/许可证-MIT-green)
 ![支持网站](https://img.shields.io/badge/支持网站-CSDN%20%7C%20掘金%20%7C%20知乎%20%7C%20微信%20%7C%20看雪%20%7C%20吾爱%20%7C%20先知-orange)
 
@@ -77,6 +77,11 @@
 - 添加页码（打印时）
 
 ## 📝 更新日志
+
+### v3.7.2
+- 🔄 优化插件悬浮窗显示比例，解决图标显示不全问题
+- ⚙️ 增大按钮和图标尺寸，提升用户体验
+- 🖥️ 优化先知社区文章中的表格和图片显示
 
 ### v3.7
 - 🆕 新增阿里云先知社区文章支持

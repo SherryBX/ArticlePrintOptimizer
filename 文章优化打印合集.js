@@ -128,16 +128,17 @@
             top: 20px !important;
             right: 20px !important;
             background-color: #fff !important;
-            border-radius: 12px !important;
+            border-radius: 8px !important;
             box-shadow: 0 6px 16px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.1) !important;
             z-index: 9999 !important;
             font-size: 14px !important;
             cursor: move !important;
-            width: 200px !important;
+            width: 260px !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
             transition: all 0.3s ease !important;
             border: 1px solid rgba(0,0,0,0.06) !important;
+            max-width: 95vw !important;
         `;
         
         // 创建标题栏
@@ -145,14 +146,14 @@
         titleBar.style.cssText = `
             background: #1890ff !important;
             color: white !important;
-            padding: 12px 16px !important;
+            padding: 16px !important;
             font-weight: 500 !important;
             font-size: 16px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            border-top-left-radius: 12px !important;
-            border-top-right-radius: 12px !important;
+            border-top-left-radius: 8px !important;
+            border-top-right-radius: 8px !important;
             cursor: move !important;
             user-select: none !important;
         `;
@@ -202,15 +203,15 @@
                 right: 20px !important;
                 background-color: #1890ff !important;
                 color: white !important;
-                width: 48px !important;
-                height: 48px !important;
+                width: 56px !important;
+                height: 56px !important;
                 border-radius: 50% !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 cursor: pointer !important;
                 box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important;
-                font-size: 20px !important;
+                font-size: 24px !important;
                 z-index: 9999 !important;
                 transition: all 0.2s !important;
             `;
@@ -235,19 +236,20 @@
         // 创建按钮容器
         const buttonsContainer = document.createElement('div');
         buttonsContainer.style.cssText = `
-            padding: 16px !important;
+            padding: 20px !important;
             display: flex !important;
             flex-direction: column !important;
-            gap: 10px !important;
+            gap: 16px !important;
         `;
         
-        // 创建按钮函数
+                    // 创建按钮函数
         function createButton(icon, text, bgColor, onClick) {
             const buttonWrapper = document.createElement('div');
             buttonWrapper.style.cssText = `
                 width: 100% !important;
-                height: 42px !important;
+                height: 48px !important;
                 position: relative !important;
+                margin-bottom: 2px !important;
             `;
             
             const button = document.createElement('button');
@@ -259,7 +261,7 @@
                 cursor: pointer !important;
                 width: 100% !important;
                 height: 100% !important;
-                font-size: 14px !important;
+                font-size: 16px !important;
                 font-weight: 500 !important;
                 transition: all 0.2s !important;
                 box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
@@ -268,6 +270,7 @@
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                letter-spacing: 0.5px !important;
             `;
             
             const iconSpan = document.createElement('span');
@@ -275,9 +278,10 @@
             iconSpan.innerHTML = icon;
             iconSpan.style.cssText = `
                 display: inline-block !important;
-                width: 18px !important;
-                margin-right: 8px !important;
+                width: 24px !important;
+                margin-right: 10px !important;
                 text-align: center !important;
+                font-size: 18px !important;
             `;
             
             const textSpan = document.createElement('span');
@@ -363,9 +367,9 @@
         footer.textContent = '文章优化打印合集 v3.7.2';
         footer.style.cssText = `
             text-align: center !important;
-            font-size: 12px !important;
+            font-size: 13px !important;
             color: rgba(0, 0, 0, 0.45) !important;
-            padding: 0 16px 12px !important;
+            padding: 0 20px 18px !important;
         `;
         
         // 组装面板
@@ -1677,8 +1681,9 @@
         // 为left_container添加样式
         const leftContainer = document.querySelector('.left_container');
         if (leftContainer) {
-            leftContainer.style.position = 'absolute';
-            leftContainer.style.left = '';
+            leftContainer.style.position = 'static';
+            leftContainer.style.width = '100%';
+            leftContainer.style.margin = '0 auto';
         }
         
         // 调整主体内容样式
@@ -1688,7 +1693,7 @@
                            
         if (mainContent) {
             mainContent.style.cssText = `
-                max-width: 800px !important;
+                max-width: 100% !important;
                 margin: 0 auto !important;
                 padding: 20px !important;
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
@@ -1707,6 +1712,11 @@
                         margin: 10px auto !important;
                         display: block !important;
                     `;
+                    // 确保图片加载完成
+                    img.loading = 'eager';
+                    // 移除可能导致图片显示不全的属性
+                    img.removeAttribute('width');
+                    img.removeAttribute('height');
                 }
             });
 
@@ -1721,8 +1731,8 @@
                     font-size: 14px !important;
                     line-height: 1.5 !important;
                     overflow-x: auto !important;
-                    white-space: pre !important;
-                    word-wrap: normal !important;
+                    white-space: pre-wrap !important;
+                    word-wrap: break-word !important;
                     max-width: 100% !important;
                     margin: 16px 0 !important;
                     border: 1px solid #e1e4e8 !important;
@@ -1745,6 +1755,19 @@
                     -webkit-print-color-adjust: exact !important;
                     print-color-adjust: exact !important;
                     user-select: none !important;
+                `;
+            });
+            
+            // 处理表格，确保表格完整显示
+            const tables = mainContent.querySelectorAll('table');
+            tables.forEach(table => {
+                table.style.cssText = `
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    overflow-x: auto !important;
+                    display: block !important;
+                    border-collapse: collapse !important;
+                    margin: 16px 0 !important;
                 `;
             });
         }
