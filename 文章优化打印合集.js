@@ -1379,7 +1379,8 @@
             'nav.text-right', // 右侧导航
             'div.container.px-0.pb-3.bbs_footer_start_column', // 页脚开始列
             'footer#footer', // 页脚
-            'a.btn.btn-secondary.btn-block.xn-back.my-3.mx-auto' // 返回按钮
+            'a.btn.btn-secondary.btn-block.xn-back.my-3.mx-auto', // 返回按钮
+            'div.act_go_top', // 返回顶部
         ];
         
         elementsToRemove.forEach(selector => {
@@ -1435,23 +1436,8 @@
                 margin: 15px auto !important;
                 white-space: pre-wrap !important;
                 word-wrap: break-word !important;
-                background-color: #1e1e1e !important;
-                color: #d4d4d4 !important;
-                border: 1px solid #333 !important;
-                padding: 15px !important;
-                border-radius: 5px !important;
-                font-family: Consolas, Monaco, monospace !important;
                 overflow-x: auto !important;
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                print-color-adjust: exact !important;
             `;
-            
-            // 调整代码块内部所有文本颜色
-            const allElements = codeBlock.querySelectorAll('*');
-            allElements.forEach(el => {
-                el.style.color = '#d4d4d4';
-            });
         });
         
         // 添加打印样式
@@ -1480,11 +1466,6 @@
                     page-break-inside: avoid !important;
                     white-space: pre-wrap !important;
                     word-break: break-word !important;
-                    background-color: #1e1e1e !important;
-                    color: #d4d4d4 !important;
-                    -webkit-print-color-adjust: exact !important;
-                    color-adjust: exact !important;
-                    print-color-adjust: exact !important;
                 }
                 
                 img {
