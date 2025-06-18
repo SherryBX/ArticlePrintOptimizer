@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         文章优化打印合集
 // @namespace    http://tampermonkey.net/
-// @version      3.7
+// @version      3.7.1
 // @description  优化CSDN、稀土掘金、知乎专栏、微信公众号、看雪论坛、吾爱论坛和阿里云先知社区文章页面用于打印，移除不必要元素并自动调用打印功能，支持导出PDF
 // @author       Sherry
 // @match        *://*.csdn.net/*/article/details/*
@@ -10,7 +10,8 @@
 // @match        *://www.52pojie.cn/thread-*-*-*.html
 // @match        *://mp.weixin.qq.com/s/*
 // @match        *://bbs.kanxue.com/thread-*.htm*
-// @match        *://xz.aliyun.com/*
+// @match        *://xz.aliyun.com/t/*
+// @match        *://xz.aliyun.com/news/*
 // @grant        none
 // @run-at       document-end
 // @icon         https://tse1-mm.cn.bing.net/th/id/OIP-C.3iWufqIms_ccabhKcsM4GgHaHa?w=180&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7
@@ -29,7 +30,7 @@
     const is52pojie = location.hostname.includes('52pojie.cn') && location.pathname.includes('/thread-');
     const isWeixin = location.hostname.includes('mp.weixin.qq.com') && location.pathname.includes('/s/');
     const isKanxue = location.hostname.includes('bbs.kanxue.com') && location.pathname.includes('/thread-');
-    const isXianzhi = location.hostname.includes('xz.aliyun.com') && location.pathname.includes('/t/');
+    const isXianzhi = location.hostname.includes('xz.aliyun.com') && (location.pathname.includes('/t/') || location.pathname.includes('/news/'));
     
     // 网站相关配置 - 统一使用蓝色主题
     const siteConfig = {
@@ -359,7 +360,7 @@
         
         // 添加版权信息
         const footer = document.createElement('div');
-        footer.textContent = '文章优化打印合集 v3.7';
+        footer.textContent = '文章优化打印合集 v3.7.1';
         footer.style.cssText = `
             text-align: center !important;
             font-size: 12px !important;
@@ -1638,8 +1639,18 @@
     
     // 优化先知社区文章页面
     function optimizeXianzhiPage(autoPrint = false, savePdf = false) {
-        // 获取文章标题
-        const articleTitle = document.querySelector('.detail-title')?.textContent?.trim() || document.title.replace(' - 先知社区', '');
+        // 获取文章标题 - 支持不同类型文章页面的标题获取
+        let articleTitle;
+        if (location.pathname.includes('/news/')) {
+            // news类型文章
+            articleTitle = document.querySelector('.article-title')?.textContent?.trim() 
+                || document.querySelector('h1')?.textContent?.trim()
+                || document.title.replace(' - 先知社区', '');
+        } else {
+            // 常规t类型文章
+            articleTitle = document.querySelector('.detail-title')?.textContent?.trim() 
+                || document.title.replace(' - 先知社区', '');
+        }
         
         // 创建新的容器
         const newContainer = document.createElement('div');
@@ -1681,8 +1692,23 @@
             padding-bottom: 16px !important;
         `;
         
-        const authorName = document.querySelector('.author-name')?.textContent?.trim() || '佚名';
-        const publishTime = document.querySelector('.time')?.textContent?.trim() || '';
+        // 获取作者和时间 - 支持不同类型文章页面的信息获取
+        let authorName = '佚名';
+        let publishTime = '';
+        
+        if (location.pathname.includes('/news/')) {
+            // news类型文章
+            authorName = document.querySelector('.author a')?.textContent?.trim() 
+                || document.querySelector('.author')?.textContent?.trim()
+                || '佚名';
+            publishTime = document.querySelector('.time')?.textContent?.trim() 
+                || document.querySelector('.date')?.textContent?.trim() 
+                || '';
+        } else {
+            // 常规t类型文章
+            authorName = document.querySelector('.author-name')?.textContent?.trim() || '佚名';
+            publishTime = document.querySelector('.time')?.textContent?.trim() || '';
+        }
         
         authorContainer.innerHTML = `
             <span style="margin-right: 16px !important;">作者：${authorName}</span>
@@ -1690,8 +1716,11 @@
         `;
         newContainer.appendChild(authorContainer);
 
-        // 克隆文章内容
-        const contentElement = document.querySelector('.detail-content');
+        // 克隆文章内容 - 支持不同类型文章页面的内容获取
+        const contentElement = location.pathname.includes('/news/') 
+            ? document.querySelector('.article-content') || document.querySelector('.content')
+            : document.querySelector('.detail-content');
+            
         if (contentElement) {
             const contentClone = contentElement.cloneNode(true);
             
@@ -1804,8 +1833,8 @@
             newContainer.appendChild(contentClone);
         }
 
-        // 删除不必要元素
-        document.querySelectorAll('#header, .nav, .sidebar, #footer, .comment, .recommend, .advertisement, .author-info').forEach(element => {
+        // 删除不必要元素 - 加入更多可能的干扰元素类名和ID
+        document.querySelectorAll('#header, .nav, .sidebar, #footer, .comment, .recommend, .advertisement, .author-info, .navbar, .related-articles, .article-tags, .actions').forEach(element => {
             if (element) element.remove();
         });
 
@@ -1820,7 +1849,7 @@
 
         // 添加版权信息
         const footer = document.createElement('div');
-        footer.textContent = '文章优化打印合集 v3.7 | 先知社区';
+        footer.textContent = '文章优化打印合集 v3.7.1 | 先知社区';
         footer.style.cssText = `
             text-align: center !important;
             font-size: 12px !important;
