@@ -497,6 +497,24 @@
         // 移除可能导致空白页的元素
         $(".first-page-break").remove();
         
+        // 为代码块设置黑色背景
+        document.querySelectorAll('pre, code, .code-snippet').forEach(codeBlock => {
+            // 不修改其他样式，只设置背景色
+            codeBlock.style.backgroundColor = '#1e1e1e';
+        });
+        
+        // 添加代码块样式
+        const codeStyle = document.createElement('style');
+        codeStyle.textContent = `
+            pre, code, .code-snippet, .prism {
+                background-color: #1e1e1e !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        `;
+        document.head.appendChild(codeStyle);
+        
         // 添加打印样式
         const printStyle = document.createElement('style');
         printStyle.id = 'csdn-print-style';
@@ -513,8 +531,12 @@
                     page-break-inside: avoid;
                 }
                 
-                pre, code, table {
+                pre, code, .code-snippet, .prism, table {
                     page-break-inside: avoid;
+                    background-color: #1e1e1e !important;
+                    -webkit-print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                    print-color-adjust: exact !important;
                 }
                 
                 img {
@@ -720,14 +742,11 @@
                     display: none !important;
                 }
                 
-                /* 确保代码块在打印时有背景色 */
+                /* 确保代码块在打印时正确换行 */
                 pre {
-                    background-color: #f6f8fa !important;
-                    border: 1px solid #ddd !important;
-                    padding: 10px !important;
-                    -webkit-print-color-adjust: exact !important;
-                    color-adjust: exact !important;
-                    print-color-adjust: exact !important;
+                    white-space: pre-wrap !important;
+                    word-break: break-word !important;
+                    page-break-inside: avoid !important;
                 }
                 
                 /* 添加页码 */
@@ -1114,45 +1133,25 @@
                 img.setAttribute('loading', 'eager'); // 确保图片在打印时可见
             });
             
-            // 处理代码块
+            // 只修改代码块的背景颜色为黑色，保留其他原始样式
             document.querySelectorAll('pre, code, .blockcode').forEach(codeBlock => {
-                codeBlock.style.cssText = `
-                    max-width: 90% !important;
-                    margin: 15px auto !important;
-                    white-space: pre-wrap !important;
-                    word-wrap: break-word !important;
-                    background-color: #1e1e1e !important;
-                    color: #d4d4d4 !important;
-                    border: 1px solid #333 !important;
-                    padding: 15px !important;
-                    border-radius: 5px !important;
-                    font-family: Consolas, Monaco, monospace !important;
-                    overflow-x: auto !important;
-                `;
-                
-                // 调整代码块内部所有文本颜色
-                const allElements = codeBlock.querySelectorAll('*');
-                allElements.forEach(el => {
-                    el.style.color = '#d4d4d4';
-                });
+                // 不修改其他样式，只设置背景色
+                codeBlock.style.backgroundColor = '#1e1e1e';
             });
             
-            // 处理打印时的代码样式
-            const codeColorStyle = document.createElement('style');
-            codeColorStyle.textContent = `
-                pre, code, .blockcode {
-                    background-color: #1e1e1e !important;
-                    color: #d4d4d4 !important;
-                    -webkit-print-color-adjust: exact !important;
-                    color-adjust: exact !important;
-                    print-color-adjust: exact !important;
-                }
-                
-                pre *, code *, .blockcode * {
-                    color: #d4d4d4 !important;
+            // 添加打印时的黑色背景样式
+            const codeLayoutStyle = document.createElement('style');
+            codeLayoutStyle.textContent = `
+                @media print {
+                    pre, code, .blockcode {
+                        background-color: #1e1e1e !important;
+                        -webkit-print-color-adjust: exact !important;
+                        color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
                 }
             `;
-            document.head.appendChild(codeColorStyle);
+            document.head.appendChild(codeLayoutStyle);
         }
         
         // 添加打印样式
@@ -1184,14 +1183,10 @@
                     page-break-inside: avoid !important;
                 }
                 
+                /* 为代码块应用黑色背景，保留其他原始样式 */
                 pre, code, .blockcode {
                     page-break-inside: avoid !important;
-                    white-space: pre-wrap !important;
-                    word-break: break-word !important;
                     background-color: #1e1e1e !important;
-                    color: #d4d4d4 !important;
-                    border: 1px solid #333 !important;
-                    padding: 10px !important;
                     -webkit-print-color-adjust: exact !important;
                     color-adjust: exact !important;
                     print-color-adjust: exact !important;
